@@ -2,7 +2,6 @@ import './App.css';
 import Header from './layout/Header';
 import Footer from './layout/Footer';
 import HomePage from './pages/HomePage';
-import ProductCard from './components/ProductCard';
 import ProductList from './components/ProductList';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 

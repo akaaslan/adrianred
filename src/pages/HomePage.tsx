@@ -1,5 +1,6 @@
 
 import bgImage from '../assets/background.png';
+import EditorsPick from '../components/EditorsPick';
 
 import { useHistory } from 'react-router-dom';
 
@@ -7,7 +8,8 @@ export default function HomePage() {
   const history = useHistory();
 
   return (
-    <main
+    <main>
+    <div
       className="w-full h-screen flex items-center justify-start relative"
       style={{
         backgroundImage: `url(${bgImage})`,
@@ -29,6 +31,8 @@ export default function HomePage() {
           SHOP NOW
         </button>
       </div>
-    </main>
+    </div>
+      <EditorsPick/>
+      </main>
   );
 }
