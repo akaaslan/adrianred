@@ -1,8 +1,15 @@
+import { Instagram, Facebook, Twitter } from "lucide-react";
+
 export default function Footer() {
   return (
     <footer className="bg-white text-black">
-      <div className="border-b">
+      <div className="border-b flex justify-between items-center py-4 ">
         <h1 className="ml-[11vw] py-10 text-3xl font-bold ">adrianred</h1>
+        <div className="mr-[10vw] flex gap-4">
+        <Instagram  />
+        <Facebook  />
+        <Twitter />
+        </div>
       </div>
       <main className="flex space-x-[10vw] justify-center items-center py-4">
       <div>

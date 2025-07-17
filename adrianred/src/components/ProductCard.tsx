@@ -1,28 +1,39 @@
 
 
+type ProductCardProps = {
+  image: string;
+  title: string;
+  description: string;
+  productImage: string;
+  department: string;
+  sales: number;
+  oldPrice: string | number;
+  newPrice: string | number;
+  colors: string[];
+  features: string[];
+  featureDesc: string;
+  reverse?: boolean;
+};
+
 const ProductCard = ({
-  image = "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80",
-  title = "MOST POPULAR",
-  description = "We focus on ergonomics and meeting you where you work. It's only a keystroke away.",
-  productImage = "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80",
-  department = "English Department",
-  sales = 15,
-  oldPrice = "$16.48",
-  newPrice = "$6.48",
-  colors = ["bg-cyan-400", "bg-orange-400", "bg-blue-400", "bg-red-400"],
-  features = [
-    "Easy to use",
-    "Easy to use",
-    "Easy to use",
-    "Easy to use",
-  ],
-  featureDesc = "Things on a very small that you have any direct",
-}) => {
+  image,
+  title,
+  description,
+  productImage,
+  department,
+  sales,
+  oldPrice,
+  newPrice,
+  colors,
+  features,
+  featureDesc,
+  reverse = false,
+}: ProductCardProps) => {
   return (
-    <div className="w-full min-h-screen bg-white flex flex-col md:flex-row items-center justify-center z-40">
+    <div className={`w-full min-h-[400px] bg-white flex flex-col md:flex-row items-center justify-center z-40 ${reverse ? 'md:flex-row-reverse' : ''}`}>
       {/* Left image section */}
       <div className="md:w-1/2 w-full h-64 md:h-auto">
-        <img src={image} alt="Product" className="object-cover w-full h-full  md:rounded-none" />
+        <img src={image} alt="Product" className="object-cover w-full h-full rounded-t-lg md:rounded-none" />
       </div>
       {/* Right details section */}
       <div className="md:w-1/2 w-full flex flex-col items-center justify-center py-6 px-4 md:py-8 md:px-6">
@@ -57,5 +68,4 @@ const ProductCard = ({
     </div>
   );
 };
-
 export default ProductCard;
