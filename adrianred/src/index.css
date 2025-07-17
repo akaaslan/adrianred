@@ -1,0 +1,5 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Purged custom base styles. Use Tailwind classes for all styling. */

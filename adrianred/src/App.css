@@ -1,0 +1,10 @@
+body, html, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.page-content {
+  min-height: calc(100vh - 100px); /* Header ve Footer yüksekliğine göre ayarla */
+  padding: 0 0;
+}

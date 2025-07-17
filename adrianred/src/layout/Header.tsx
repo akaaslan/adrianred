@@ -1,0 +1,125 @@
+import { Search, User, ShoppingCart, Heart } from "lucide-react";
+// import { useHistory } from "react-router-dom";
+import { useState } from "react";
+
+export default function Header() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileShopOpen, setMobileShopOpen] = useState(false);
+
+  return (
+    <header className="fixed top-0 left-0 w-full bg-transparent z-50 ">
+      <div className="max-w-7xl mx-[10vw] px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+        {/* Logo */}
+        <div className="text-3xl font-bold tracking-tight text-white flex-shrink-0"><a href="/">adrianred</a></div>
+
+        {/* Navigation */}
+        <nav className="hidden md:flex gap-6 text-sm font-medium">
+          <a href="/" className="text-white font-bold">Home</a>
+          <div className="relative group">
+            <button className="text-white font-bold flex items-center gap-1 focus:outline-none">
+              Shop
+              <svg className="w-4 h-4 transform transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div className="absolute left-0 mt-0 w-40 bg-white rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity z-50">
+              <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">All Products</a>
+              <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Men</a>
+              <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Women</a>
+              <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Sale</a>
+            </div>
+          </div>
+          <a href="#" className="text-white font-bold">About</a>
+          <a href="#" className="text-white font-bold">Blog</a>
+          <a href="#" className="text-white font-bold">Contact</a>
+          <a href="#" className="text-white font-bold">Pages</a>
+        </nav>
+
+        {/* Mobile menu button */}
+        <button
+          className="md:hidden text-white focus:outline-none"
+          title="Open menu"
+          onClick={() => setMobileMenuOpen((open) => !open)}
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+
+        {/* Mobile menu dropdown */}
+        {mobileMenuOpen && (
+          <div className="md:hidden absolute top-full left-0 w-full bg-black bg-opacity-95 flex flex-col py-4 px-6 z-50 transition-all duration-300 transform origin-top scale-y-0 opacity-0"
+            style={{
+              transform: mobileMenuOpen ? 'scaleY(1)' : 'scaleY(0)',
+              opacity: mobileMenuOpen ? 1 : 0,
+            }}
+          >
+            <nav className="flex flex-col gap-2 mb-6">
+              <a href="#" className="text-white font-bold py-2 px-2 rounded hover:bg-gray-800 transition">Home</a>
+              <div className="relative">
+                <button
+                  className="w-full text-white font-bold flex items-center justify-between gap-1 focus:outline-none py-2 px-2 rounded hover:bg-gray-800 transition"
+                  onClick={() => setMobileShopOpen((open) => !open)}
+                  aria-expanded={mobileShopOpen}
+                >
+                  <span className="text-center">Shop</span>
+                  <svg className={`w-4 h-4 transform transition-transform duration-200 ${mobileShopOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </button>
+                <div className={`overflow-hidden transition-all duration-300 ${mobileShopOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'} bg-white rounded shadow-lg mt-2 ml-2`}> 
+                  <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">All Products</a>
+                  <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Men</a>
+                  <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Women</a>
+                  <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Sale</a>
+                </div>
+              </div>
+              <a href="#" className="text-white font-bold py-2 px-2 rounded hover:bg-gray-800 transition">About</a>
+              <a href="#" className="text-white font-bold py-2 px-2 rounded hover:bg-gray-800 transition">Blog</a>
+              <a href="#" className="text-white font-bold py-2 px-2 rounded hover:bg-gray-800 transition">Contact</a>
+              <a href="#" className="text-white font-bold py-2 px-2 rounded hover:bg-gray-800 transition">Pages</a>
+            </nav>
+            <div className="flex items-center gap-4 justify-end">
+              <button className="flex items-center gap-2 text-white hover:text-gray-300" title="User Account">
+                <User className="w-5 h-5" />
+                <span className="text-sm font-sm font-bold">Login / Register</span>
+              </button>
+              <button className="text-white hover:text-gray-300" title="Search">
+                <Search className="w-5 h-5" />
+              </button>
+              <button className="flex relative text-white hover:text-gray-300" title="Shopping Cart">
+                <ShoppingCart className="w-5 h-5" />
+                <span className="ml-3 b-1"> 3 </span>
+              </button>
+              <button className="flex relative text-white hover:text-gray-300" title="Shopping Cart">
+                <Heart className="w-5 h-5" />
+                <span className="ml-3 b-1"> 3 </span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Right-side Icons */}
+        <div className="hidden md:flex items-center gap-4">
+          <button className="flex items-center gap-2 text-white hover:text-gray-300" title="User Account">
+            <User className="w-5 h-5" />
+            <span className="text-sm font-sm font-bold">Login / Register</span>
+          </button>
+          <button className="text-white hover:text-gray-300" title="Search">
+            <Search className="w-5 h-5" />
+          </button>
+          <button className="flex relative text-white hover:text-gray-300" title="Shopping Cart">
+            <ShoppingCart className="w-5 h-5" />
+            <span className="ml-3 b-1"> 3 </span>
+          </button>
+          <button className="flex relative text-white hover:text-gray-300" title="Shopping Cart">
+            <Heart className="w-5 h-5" />
+            <span className="ml-3 b-1"> 3 </span>
+          </button>
+        </div>
+      </div>
+    </header>
+  );
+}
