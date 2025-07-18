@@ -2,41 +2,42 @@ import React, { useState, useRef } from "react";
 import shopItems from "./ShopItemData";
 import ShopItemCard from "./ShopItemCard";
 
-
-
-export default function ShopItemList() {
+const ShopItemList: React.FC = () => {
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [sort, setSort] = useState('popularity');
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState(false);
   const [itemsPerPage, setItemsPerPage] = useState(12);
   const containerRef = useRef<HTMLDivElement>(null);
+  const prevPage = useRef(page);
 
+  // Sorting logic
+  const products = React.useMemo(() => {
+    const arr = [...shopItems];
+    if (sort === 'low') {
+      arr.sort((a, b) => parseFloat(a.salePrice.slice(1)) - parseFloat(b.salePrice.slice(1)));
+    } else if (sort === 'high') {
+      arr.sort((a, b) => parseFloat(b.salePrice.slice(1)) - parseFloat(a.salePrice.slice(1)));
+    }
+    return arr;
+  }, [sort]);
 
-// Sorting logic
-const products = React.useMemo(() => {
-  const arr = [...shopItems];
-  if (sort === 'low') {
-    arr.sort((a, b) => parseFloat(a.salePrice.slice(1)) - parseFloat(b.salePrice.slice(1)));
-  } else if (sort === 'high') {
-    arr.sort((a, b) => parseFloat(b.salePrice.slice(1)) - parseFloat(a.salePrice.slice(1)));
-  }
-  return arr;
-}, [sort]);
+  // Pagination logic
+  const totalPages = Math.ceil(products.length / itemsPerPage);
+  const paginated = products.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
-// Pagination logic
-const totalPages = Math.ceil(products.length / itemsPerPage);
-const paginated = products.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+  React.useEffect(() => { setPage(1); }, [itemsPerPage]);
 
-
-React.useEffect(() => { setPage(1); }, [itemsPerPage]);
-
-// Scroll to top of ShopItemList when page changes
-React.useEffect(() => {
-  if (containerRef.current) {
-    containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-}, [page]);
+  // Scroll to top of ShopItemList only if page is changed by user (not on mount or itemsPerPage change)
+  React.useEffect(() => {
+    // Only scroll if previous page is different and not due to itemsPerPage reset
+    if (prevPage.current !== page && prevPage.current !== 1) {
+      if (containerRef.current) {
+        containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+    prevPage.current = page;
+  }, [page]);
 
   return (
     <div ref={containerRef} className="bg-white w-full max-w-7xl px-4 sm:px-6 lg:px-8 mx-auto py-8 flex flex-col items-center">
@@ -129,4 +130,6 @@ React.useEffect(() => {
       </div>
     </div>
   );
-}
+};
+
+export default ShopItemList;
