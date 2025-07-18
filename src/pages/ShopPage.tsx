@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 // import ProductList from "../components/ProductList";
 
 import ShopItemList from "../components/ShopItemList";
