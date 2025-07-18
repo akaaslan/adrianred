@@ -1,15 +1,57 @@
 import { Search, User, ShoppingCart, Heart } from "lucide-react";
-// import { useHistory } from "react-router-dom";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-export default function Header({ theme = "dark" }) {
+interface HeaderProps {
+  theme?: "light" | "dark";
+}
+
+const Header: React.FC<HeaderProps> = ({ theme = "dark" }) => {
   const textColor = theme === "light" ? "text-gray-500 drop-shadow-lg" : "text-white";
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileShopOpen, setMobileShopOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 0);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <header className="fixed top-0 left-0 w-full bg-transparent z-50 ">
-      <div className="max-w-7xl mx-[10vw] px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+    <header
+      className={`fixed top-0 left-0 w-full z-50 transition-shadow duration-300 ${scrolled ? '' : ''}`}
+      style={{ position: 'fixed', top: '0px', left: 0, width: '100%', zIndex: 50 }}
+    >
+      <style>{`
+        .header-bg {
+          position: absolute;
+          top: 0; left: 0; width: 100%; height: 100%;
+          z-index: 0;
+          background: rgba(156, 163, 175, 0.8); /* Tailwind gray-400/80 */
+          backdrop-filter: blur(8px);
+          pointer-events: none;
+          transition: box-shadow 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        .header-bg-slide {
+          animation: headerBgSlideDown 0.4s cubic-bezier(0.4,0,0.2,1);
+        }
+        @keyframes headerBgSlideDown {
+          from {
+            transform: translateY(-30px);
+            opacity: 0.7;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+      `}</style>
+      {scrolled && (
+        <div className={`header-bg header-bg-slide`}></div>
+      )}
+      <div className="relative max-w-7xl mx-[10vw] px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between" style={{zIndex: 1}}>
         {/* Logo */}
         <div className={`text-3xl font-bold tracking-tight ${textColor} flex-shrink-0`}><a href="/">adrianred</a></div>
 
@@ -123,4 +165,6 @@ export default function Header({ theme = "dark" }) {
       </div>
     </header>
   );
-}
+};
+
+export default Header;

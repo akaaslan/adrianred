@@ -7,27 +7,27 @@ export default function EditorsPick() {
       </div>
       <div className="flex flex-col md:flex-row justify-center items-stretch gap-6 max-w-5xl mx-auto">
         {/* Left large image */}
-        <div className="flex-1 flex flex-col hover:scale-105 hover:shadow-lg transition-transform duration-300">
-          <div className="relative h-[350px] md:h-[400px] w-full overflow-hidden rounded-lg ">
+        <div className="flex-1 flex flex-col hover:scale-105  transition-transform duration-300">
+          <div className="relative h-[58vh] w-[90vw] md:w-full mx-auto md:mx-0 overflow-hidden rounded-lg ">
             <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80" alt="Men" className="object-cover w-full h-full" />
             <span className="absolute bottom-6 left-6 bg-white px-6 py-2 font-bold text-lg rounded shadow">MEN</span>
           </div>
         </div>
         {/* Right grid */}
-        <div className="flex-[1.2] grid grid-cols-2 grid-rows-2 gap-6 min-w-[300px] ">
-          <div className="relative h-[190px] w-full overflow-hidden rounded-lg hover:shadow-lg hover:scale-105 transition-transform duration-300">
+        <div className="flex-[1.2] grid grid-cols-2 grid-rows-2 gap-6 min-w-[200px] md:min-w-[300px]">
+          <div className="relative h-[190px] md:h-[190px] w-[40vw] md:w-full mx-auto md:mx-0 overflow-hidden rounded-lg hover:shadow-lg hover:scale-105 transition-transform duration-300">
             <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80" alt="Women" className="object-cover w-full h-full" />
             <span className="absolute bottom-6 left-6 bg-white px-6 py-2 font-bold text-lg rounded shadow">WOMEN</span>
           </div>
-          <div className="relative h-[190px] w-full overflow-hidden rounded-lg hover:shadow-lg hover:scale-105 transition-transform duration-300">
+          <div className="relative h-[190px] md:h-[190px] w-[40vw] md:w-full mx-auto md:mx-0 overflow-hidden rounded-lg hover:shadow-lg hover:scale-105 transition-transform duration-300">
             <img src="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=400&q=80" alt="Accessories" className="object-cover w-full h-full" />
             <span className="absolute bottom-6 left-6 bg-white px-6 py-2 font-bold text-lg rounded shadow">ACCESSORIES</span>
           </div>
-          <div className="relative h-[190px] w-full overflow-hidden rounded-lg hover:shadow-lg hover:scale-105 transition-transform duration-300">
+          <div className="relative h-[190px] md:h-[190px] w-[40vw] md:w-full mx-auto md:mx-0 overflow-hidden rounded-lg hover:shadow-lg hover:scale-105 transition-transform duration-300">
             <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=400&q=80" alt="Kids" className="object-cover w-full h-full" />
             <span className="absolute bottom-6 left-6 bg-white px-6 py-2 font-bold text-lg rounded shadow">KIDS</span>
           </div>
-          <div className="relative h-[190px] w-full overflow-hidden rounded-lg hover:shadow-lg hover:scale-105 transition-transform duration-300">
+          <div className="relative h-[190px] md:h-[190px] w-[40vw] md:w-full mx-auto md:mx-0 overflow-hidden rounded-lg hover:shadow-lg hover:scale-105 transition-transform duration-300">
             <img src="https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=400&q=80" alt="Accessories" className="object-cover w-full h-full" />
             <span className="absolute bottom-6 left-6 bg-white px-6 py-2 font-bold text-lg rounded shadow">ACCESSORIES</span>
           </div>

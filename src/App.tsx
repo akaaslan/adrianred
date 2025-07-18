@@ -2,22 +2,22 @@ import './App.css';
 import Header from './layout/Header';
 import Footer from './layout/Footer';
 import HomePage from './pages/HomePage';
+
 import ProductList from './components/ProductList';
 import { BrowserRouter as Router, Route, Switch, useLocation } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import PageLoader from './components/PageLoader';
+import ShopPage from './pages/ShopPage';
 
 function App() {  
   return (
     <Router>
       <LoaderWrapper />
-      {/* Use location to set header theme */}
-      <Route render={({ location }) => (
-        <Header theme={location.pathname === '/product' ? 'light' : 'dark'} />
-      )} />
+      <Header />
       <div className="page-content">
         <Switch>
           <Route exact path="/" component={HomePage} />
+          <Route path="/shop" component={ShopPage} />
           <Route path="/product" component={ProductList} />
         </Switch>
       </div>

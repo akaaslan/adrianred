@@ -8,7 +8,6 @@ import FeaturedProducts from '../components/FeaturedProducts';
 import NewSeasonProduct from '../components/NewSeasonProduct';
 import FeaturedPosts from '../components/FeaturedPosts';
 
-import { useHistory } from 'react-router-dom';
 import HeroCarousel from '../components/HeroCarousel';
 
 const NextArrow = (props: CustomArrowProps) => (
@@ -34,8 +33,6 @@ const PrevArrow = (props: CustomArrowProps) => (
 );
 
 export default function HomePage() {
-  const history = useHistory();
-
   return (
     <main>
       <div className="w-full h-screen relative">
@@ -69,12 +66,12 @@ export default function HomePage() {
                   <h2 className="text-lg font-bold text-white mb-2">SUMMER 2020</h2>
                   <h1 className="text-5xl font-extrabold text-white mb-4">IT’S A SPECIAL GIFT</h1>
                   <p className="text-white mb-6">We know how large objects will act, but things on a small scale</p>
-                  <button
+                  <a
+                    href="/shop"
                     className="bg-blue-500 text-white font-bold px-6 py-3 rounded hover:bg-blue-600 transition"
-                    onClick={() => history.push('/product')}
                   >
                     SHOP NOW
-                  </button>
+                  </a>
                 </div>
               </div>
             </div>
