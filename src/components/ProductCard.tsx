@@ -33,7 +33,7 @@ const ProductCard = ({
     <div className={`w-full min-h-[400px] bg-white flex flex-col md:flex-row items-center justify-center z-40 ${reverse ? 'md:flex-row-reverse' : ''}`}>
       {/* Left image section */}
       <div className="md:w-1/2 w-full h-64 md:h-auto">
-        <img src={image} alt="Product" className="object-cover w-full h-full rounded-t-lg md:rounded-none" />
+        <img src={image} alt="Product" className="object-cover w-full h-full rounded-none-t-lg md:rounded-none" />
       </div>
       {/* Right details section */}
       <div className="md:w-1/2 w-full flex flex-col items-center justify-center py-6 px-4 md:py-8 md:px-6">

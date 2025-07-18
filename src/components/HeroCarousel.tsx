@@ -69,7 +69,7 @@ const HeroCarousel: React.FC = () => (
               <h1 className="text-5xl font-semibold text-white mb-4">Vita Classic Product</h1>
               <p className="text-white mb-6">We know how large objects will act, but things on a small scale</p>
               <div className="mt-6 flex">
-                  <span className='text-white text-2xl mr-[1vw] mt-2 font-bold'>$16.48</span>
+                  <span className='text-white text-2xl mr-[3vw] mt-2 font-bold '>$16.48</span>
               <button
                 className="bg-green-500 text-white font-bold px-6 py-3 rounded hover:bg-blue-600 transition"
                 onClick={() => {}}

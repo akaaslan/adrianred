@@ -16,7 +16,7 @@ interface FeaturedPostCardProps {
 
 const FeaturedPostCard: React.FC<FeaturedPostCardProps> = ({ post }) => {
   return (
-    <div className="bg-white rounded-lg shadow-sm border flex flex-col overflow-hidden w-full max-w-xs mx-auto">
+    <div className="bg-white rounded-lg shadow-sm border flex flex-col overflow-hidden w-full max-w-xs mx-auto hover:scale-105 hover:rotate-[2deg] transition-transform duration-300  ">
       <div className="relative">
         <img src={post.image} alt={post.title} className="w-full h-48 object-cover" />
         {post.isNew && (
