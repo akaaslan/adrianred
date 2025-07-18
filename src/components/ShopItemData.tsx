@@ -8,151 +8,24 @@ export interface ShopItem {
   image: string;
 }
 
-const shopItems: ShopItem[] = [
-  {
-    id: 1,
-    name: "Graphic Design",
-    department: "English Department",
-    price: "$16.48",
-    salePrice: "$6.48",
+function getRandomPrice(min = 5, max = 100) {
+  const price = Math.random() * (max - min) + min;
+  return price.toFixed(2);
+}
+
+const shopItems: ShopItem[] = Array.from({ length: 32 }, (_, i) => {
+  const price = parseFloat(getRandomPrice());
+  const salePrice = (price * (Math.random() * 0.5 + 0.3)).toFixed(2);
+
+  return {
+    id: i + 1,
+    name: "Fashion Item",
+    department: "Clothing",
+    price: `$${price.toFixed(2)}`,
+    salePrice: `$${salePrice}`,
     colors: ["#00BFFF", "#00C49A", "#FFBB28", "#FF8042"],
-    image: "https://randomuser.me/api/portraits/men/32.jpg",
-  },
-  {
-    id: 2,
-    name: "Graphic Design",
-    department: "English Department",
-    price: "$16.48",
-    salePrice: "$6.48",
-    colors: ["#00BFFF", "#00C49A", "#FFBB28", "#FF8042"],
-    image: "https://randomuser.me/api/portraits/women/44.jpg",
-  },
-  {
-    id: 3,
-    name: "Graphic Design",
-    department: "English Department",
-    price: "$16.48",
-    salePrice: "$6.48",
-    colors: ["#00BFFF", "#00C49A", "#FFBB28", "#FF8042"],
-    image: "https://randomuser.me/api/portraits/women/65.jpg",
-  },
-  {
-    id: 4,
-    name: "Graphic Design",
-    department: "English Department",
-    price: "$16.48",
-    salePrice: "$6.48",
-    colors: ["#00BFFF", "#00C49A", "#FFBB28", "#FF8042"],
-    image: "https://randomuser.me/api/portraits/men/45.jpg",
-  },
-  {
-    id: 5,
-    name: "Graphic Design",
-    department: "English Department",
-    price: "$16.48",
-    salePrice: "$6.48",
-    colors: ["#00BFFF", "#00C49A", "#FFBB28", "#FF8042"],
-    image: "https://randomuser.me/api/portraits/men/46.jpg",
-  },
-  {
-    id: 6,
-    name: "Graphic Design",
-    department: "English Department",
-    price: "$16.48",
-    salePrice: "$6.48",
-    colors: ["#00BFFF", "#00C49A", "#FFBB28", "#FF8042"],
-    image: "https://randomuser.me/api/portraits/men/47.jpg",
-  },
-  {
-    id: 7,
-    name: "Graphic Design",
-    department: "English Department",
-    price: "$16.48",
-    salePrice: "$6.48",
-    colors: ["#00BFFF", "#00C49A", "#FFBB28", "#FF8042"],
-    image: "https://randomuser.me/api/portraits/men/48.jpg",
-  },
-  {
-    id: 8,
-    name: "Graphic Design",
-    department: "English Department",
-    price: "$16.48",
-    salePrice: "$6.48",
-    colors: ["#00BFFF", "#00C49A", "#FFBB28", "#FF8042"],
-    image: "https://randomuser.me/api/portraits/women/49.jpg",
-  },
-  {
-    id: 9,
-    name: "Graphic Design",
-    department: "English Department",
-    price: "$16.48",
-    salePrice: "$6.48",
-    colors: ["#00BFFF", "#00C49A", "#FFBB28", "#FF8042"],
-    image: "https://randomuser.me/api/portraits/women/50.jpg",
-  },
-  {
-    id: 10,
-    name: "Graphic Design",
-    department: "English Department",
-    price: "$16.48",
-    salePrice: "$6.48",
-    colors: ["#00BFFF", "#00C49A", "#FFBB28", "#FF8042"],
-    image: "https://randomuser.me/api/portraits/men/51.jpg",
-  },
-  {
-    id: 11,
-    name: "Graphic Design",
-    department: "English Department",
-    price: "$16.48",
-    salePrice: "$6.48",
-    colors: ["#00BFFF", "#00C49A", "#FFBB28", "#FF8042"],
-    image: "https://randomuser.me/api/portraits/men/52.jpg",
-  },
-  {
-    id: 12,
-    name: "Graphic Design",
-    department: "English Department",
-    price: "$16.48",
-    salePrice: "$6.48",
-    colors: ["#00BFFF", "#00C49A", "#FFBB28", "#FF8042"],
-    image: "https://randomuser.me/api/portraits/women/53.jpg",
-  },
-  {
-    id: 13,
-    name: "Graphic Design",
-    department: "English Department",
-    price: "$16.48",
-    salePrice: "$6.48",
-    colors: ["#00BFFF", "#00C49A", "#FFBB28", "#FF8042"],
-    image: "https://randomuser.me/api/portraits/women/54.jpg",
-  },
-  {
-    id: 14,
-    name: "Graphic Design",
-    department: "English Department",
-    price: "$16.48",
-    salePrice: "$6.48",
-    colors: ["#00BFFF", "#00C49A", "#FFBB28", "#FF8042"],
-    image: "https://randomuser.me/api/portraits/women/55.jpg",
-  },
-  {
-    id: 15,
-    name: "Graphic Design",
-    department: "English Department",
-    price: "$16.48",
-    salePrice: "$6.48",
-    colors: ["#00BFFF", "#00C49A", "#FFBB28", "#FF8042"],
-    image: "https://randomuser.me/api/portraits/women/56.jpg",
-  },
-  {
-    id: 16,
-    name: "Graphic Design",
-    department: "English Department",
-    price: "$16.48",
-    salePrice: "$6.48",
-    colors: ["#00BFFF", "#00C49A", "#FFBB28", "#FF8042"],
-    image: "https://randomuser.me/api/portraits/women/57.jpg",
-  },
-];
+    image: `https://picsum.photos/seed/clothes${i + 1}/400/400?blur=1`,
+  };
+});
 
 export default shopItems;

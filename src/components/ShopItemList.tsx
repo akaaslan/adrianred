@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import shopItems from "./ShopItemData";
 import ShopItemCard from "./ShopItemCard";
 
@@ -10,6 +10,7 @@ export default function ShopItemList() {
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState(false);
   const [itemsPerPage, setItemsPerPage] = useState(12);
+  const containerRef = useRef<HTMLDivElement>(null);
 
 
 // Sorting logic
@@ -27,13 +28,20 @@ const products = React.useMemo(() => {
 const totalPages = Math.ceil(products.length / itemsPerPage);
 const paginated = products.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
-// Reset page if itemsPerPage changes
+
 React.useEffect(() => { setPage(1); }, [itemsPerPage]);
 
+// Scroll to top of ShopItemList when page changes
+React.useEffect(() => {
+  if (containerRef.current) {
+    containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}, [page]);
+
   return (
-    <div className="bg-white w-full max-w-7xl px-4 sm:px-6 lg:px-8 mx-auto py-8 flex flex-col items-center">
+    <div ref={containerRef} className="bg-white w-full max-w-7xl px-4 sm:px-6 lg:px-8 mx-auto py-8 flex flex-col items-center">
       {/* Top bar */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-10 gap-[21vw]">
         <div className="text-gray-600 text-sm">Showing {products.length} results</div>
         <div className="flex items-center gap-2">
           <span className="text-gray-600 text-sm">View:</span>

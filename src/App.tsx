@@ -37,7 +37,7 @@ function LoaderWrapper() {
       return;
     }
     setLoading(true);
-    const timeout = setTimeout(() => setLoading(false), 600);
+    const timeout = setTimeout(() => setLoading(false), 200);
     return () => clearTimeout(timeout);
   }, [location]);
   return loading ? <PageLoader /> : null;

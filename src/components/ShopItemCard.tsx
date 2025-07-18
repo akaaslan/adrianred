@@ -13,7 +13,7 @@ export interface ShopItem {
 const ShopItemCard: React.FC<{ product: ShopItem; view: 'grid' | 'list' }> = ({ product, view }) => {
   if (view === 'list') {
     return (
-      <div className="bg-white rounded-lg shadow p-4 flex flex-col md:flex-row items-center gap-4 h-[20vh] hover:shadow-lg hover:scale-105 transition-all duration-200">
+      <div className="bg-white rounded-lg shadow p-4 flex flex-col md:flex-row items-center w-[85vw] gap-4 h-[20vh] hover:shadow-lg hover:scale-105 transition-all duration-200">
         <img src={product.image} alt={product.name} className="w-32 h-32 object-cover rounded mb-4 md:mb-0" />
         <div className="flex-1 flex flex-col items-center md:items-start">
           <div className="font-bold text-gray-800 text-base mb-1">{product.name}</div>
