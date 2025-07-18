@@ -3,11 +3,14 @@ import Header from './layout/Header';
 import Footer from './layout/Footer';
 import HomePage from './pages/HomePage';
 import ProductList from './components/ProductList';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import PageLoader from './components/PageLoader';
 
-function App() {
+function App() {  
   return (
     <Router>
+      <LoaderWrapper />
       {/* Use location to set header theme */}
       <Route render={({ location }) => (
         <Header theme={location.pathname === '/product' ? 'light' : 'dark'} />
@@ -21,6 +24,23 @@ function App() {
       <Footer />
     </Router>
   );
+}
+
+function LoaderWrapper() {
+  const location = useLocation();
+  const [loading, setLoading] = useState(false);
+  const isFirstLoad = React.useRef(true);
+  useEffect(() => {
+    if (isFirstLoad.current) {
+      isFirstLoad.current = false;
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    const timeout = setTimeout(() => setLoading(false), 600);
+    return () => clearTimeout(timeout);
+  }, [location]);
+  return loading ? <PageLoader /> : null;
 }
 
 export default App;
