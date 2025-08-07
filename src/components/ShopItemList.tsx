@@ -28,9 +28,7 @@ const ShopItemList: React.FC = () => {
 
   React.useEffect(() => { setPage(1); }, [itemsPerPage]);
 
-  // Scroll to top of ShopItemList only if page is changed by user (not on mount or itemsPerPage change)
   React.useEffect(() => {
-    // Only scroll if previous page is different and not due to itemsPerPage reset
     if (prevPage.current !== page && prevPage.current !== 1) {
       if (containerRef.current) {
         containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });

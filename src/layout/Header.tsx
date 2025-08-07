@@ -1,5 +1,6 @@
 import { Search, User, ShoppingCart, Heart } from "lucide-react";
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 interface HeaderProps {
   theme?: "light" | "dark";
@@ -53,11 +54,11 @@ const Header: React.FC<HeaderProps> = ({ theme = "dark" }) => {
       )}
       <div className="relative max-w-7xl mx-[10vw] px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between" style={{zIndex: 1}}>
         {/* Logo */}
-        <div className={`text-3xl font-bold tracking-tight ${textColor} flex-shrink-0`}><a href="/">adrianred</a></div>
+        <div className={`text-3xl font-bold tracking-tight ${textColor} flex-shrink-0`}><Link to="/">adrianred</Link></div>
 
         {/* Navigation */}
         <nav className="hidden md:flex gap-6 text-sm font-medium">
-          <a href="/" className={`${textColor} font-bold`}>Home</a>
+          <Link to="/" className={`${textColor} font-bold`}>Home</Link>
           <div className="relative group">
             <button className={`${textColor} font-bold flex items-center gap-1 focus:outline-none`}>
               Shop
@@ -66,15 +67,15 @@ const Header: React.FC<HeaderProps> = ({ theme = "dark" }) => {
               </svg>
             </button>
             <div className="absolute left-0 mt-0 w-40 bg-white rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity z-50">
-              <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">All Products</a>
+              <Link to="/shop" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">All Products</Link>
               <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Men</a>
               <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Women</a>
               <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Sale</a>
             </div>
           </div>
-          <a href="#" className={`${textColor} font-bold`}>About</a>
-          <a href="#" className={`${textColor} font-bold`}>Blog</a>
-          <a href="#" className={`${textColor} font-bold`}>Contact</a>
+          <Link to="/team" className={`${textColor} font-bold`}>Team</Link>
+          <Link to="/about" className={`${textColor} font-bold`}>About</Link>
+          <Link to="/contact" className={`${textColor} font-bold`}>Contact</Link>
           <a href="#" className={`${textColor} font-bold`}>Pages</a>
         </nav>
 
@@ -100,7 +101,7 @@ const Header: React.FC<HeaderProps> = ({ theme = "dark" }) => {
             }}
           >
             <nav className="flex flex-col gap-2 mb-6">
-              <a href="#" className={`${textColor} font-bold py-2 px-2 rounded hover:bg-gray-800 transition`}>Home</a>
+              <Link to="/" className={`${textColor} font-bold py-2 px-2 rounded hover:bg-gray-800 transition`}>Home</Link>
               <div className="relative">
                 <button
                   className={`w-full ${textColor} font-bold flex items-center justify-between gap-1 focus:outline-none py-2 px-2 rounded hover:bg-gray-800 transition`}
@@ -113,15 +114,15 @@ const Header: React.FC<HeaderProps> = ({ theme = "dark" }) => {
                   </svg>
                 </button>
                 <div className={`overflow-hidden transition-all duration-300 ${mobileShopOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'} bg-white rounded shadow-lg mt-2 ml-2`}> 
-                  <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">All Products</a>
+                  <Link to="/shop" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">All Products</Link>
                   <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Men</a>
                   <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Women</a>
                   <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Sale</a>
                 </div>
               </div>
-              <a href="#" className={`${textColor} font-bold py-2 px-2 rounded hover:bg-gray-800 transition`}>About</a>
-              <a href="#" className={`${textColor} font-bold py-2 px-2 rounded hover:bg-gray-800 transition`}>Blog</a>
-              <a href="#" className={`${textColor} font-bold py-2 px-2 rounded hover:bg-gray-800 transition`}>Contact</a>
+              <Link to="/team" className={`${textColor} font-bold py-2 px-2 rounded hover:bg-gray-800 transition`}>Team</Link>
+              <Link to="/about" className={`${textColor} font-bold py-2 px-2 rounded hover:bg-gray-800 transition`}>About</Link>
+              <Link to="/contact" className={`${textColor} font-bold py-2 px-2 rounded hover:bg-gray-800 transition`}>Contact</Link>
               <a href="#" className={`${textColor} font-bold py-2 px-2 rounded hover:bg-gray-800 transition`}>Pages</a>
             </nav>
             <div className="flex items-center gap-4 justify-end">

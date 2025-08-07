@@ -1,4 +1,5 @@
 
+import { useEffect } from 'react';
 import bgImage from '../assets/background.png';
 import Slider, { type CustomArrowProps } from 'react-slick';
 import 'slick-carousel/slick/slick.css';
@@ -33,6 +34,10 @@ const PrevArrow = (props: CustomArrowProps) => (
 );
 
 export default function HomePage() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <main>
       <div className="w-full h-screen relative">

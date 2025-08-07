@@ -8,6 +8,10 @@ import { BrowserRouter as Router, Route, Switch, useLocation } from 'react-route
 import React, { useState, useEffect } from 'react';
 import PageLoader from './components/PageLoader';
 import ShopPage from './pages/ShopPage';
+import ProductDetailPage from './pages/ProductDetailPage';
+import ContactPage from './pages/ContactPage';
+import TeamPage from './pages/TeamPage';
+import AboutPage from './pages/AboutPage';
 
 function App() {  
   return (
@@ -18,6 +22,10 @@ function App() {
         <Switch>
           <Route exact path="/" component={HomePage} />
           <Route path="/shop" component={ShopPage} />
+          <Route path="/product/:id" component={ProductDetailPage} />
+          <Route path="/contact" component={ContactPage} />
+          <Route path="/team" component={TeamPage} />
+          <Route path="/about" component={AboutPage} />
           <Route path="/product" component={ProductList} />
         </Switch>
       </div>

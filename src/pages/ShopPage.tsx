@@ -1,15 +1,19 @@
-// import ProductList from "../components/ProductList";
-
+import { useEffect } from "react";
 import ShopItemList from "../components/ShopItemList";
+import { Link } from "react-router-dom";
 
 export default function ShopPage() {
 
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     return (
         <div className="flex flex-col w-full">
-            <div className="flex flex-row py-10 px-[12vw] items-center justify-between w-full">
+            <div className="flex flex-row py-10 px-[12vw] pt-24 items-center justify-between w-full">
                 <h1 className="text-2xl font-bold ">Shop</h1>
                 <div className="flex items-center ml-auto">
-                    <a href="/" className="text-lg text-black mr-1 hover:underline">Home</a>
+                    <Link to="/" className="text-lg text-black mr-1 hover:underline">Home</Link>
                     <span className="text-lg text-gray-400">&gt;</span>
                     <span className="text-lg ml-1 hover:underline text-gray-400">Shop</span>
                 </div>
