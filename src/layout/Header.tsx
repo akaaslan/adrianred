@@ -258,6 +258,18 @@ const Header: React.FC<HeaderProps> = ({ theme = "dark" }) => {
                         <User className="w-4 h-4" />
                         Logout
                       </button>
+                      
+                      {/* Special Button for Mobile */}
+                      {isSpecialUser && (
+                        <Link 
+                          to="/x9k2m5p8q1w3"
+                          className={`${textColor} font-bold py-2 px-2 rounded hover:bg-gray-800 transition flex items-center gap-2 border border-current`}
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <span className="text-sm">✨</span>
+                          BURAYA TIKLA
+                        </Link>
+                      )}
                     </>
                   )}
                 </div>
