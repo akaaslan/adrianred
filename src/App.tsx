@@ -12,6 +12,8 @@ import ProductDetailPage from './pages/ProductDetailPage';
 import ContactPage from './pages/ContactPage';
 import TeamPage from './pages/TeamPage';
 import AboutPage from './pages/AboutPage';
+import SignUpPage from './pages/SignUpPage';
+import LoginPage from './pages/LoginPage';
 
 function App() {  
   return (
@@ -26,6 +28,8 @@ function App() {
           <Route path="/contact" component={ContactPage} />
           <Route path="/team" component={TeamPage} />
           <Route path="/about" component={AboutPage} />
+          <Route path="/signup" component={SignUpPage} />
+          <Route path="/login" component={LoginPage} />
           <Route path="/product" component={ProductList} />
         </Switch>
       </div>

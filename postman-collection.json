@@ -1,0 +1,920 @@
+{
+  "info": {
+    "name": "Adrian Red E-Commerce API",
+    "description": "Complete API collection for Adrian Red e-commerce platform with authentication, user management, product catalog, and store operations",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://workintech-fe-ecommerce.onrender.com",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Sign Up - Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"role_id\": 3\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/signup",
+              "host": ["{{baseUrl}}"],
+              "path": ["signup"]
+            },
+            "description": "Register a new customer account"
+          },
+          "response": []
+        },
+        {
+          "name": "Sign Up - Store",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Store Owner\",\n  \"email\": \"store@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"role_id\": 2,\n  \"store\": {\n    \"name\": \"My Fashion Store\",\n    \"phone\": \"05551234567\",\n    \"tax_no\": \"T1234V567890\",\n    \"bank_account\": \"TR123456789012345678901234\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/signup",
+              "host": ["{{baseUrl}}"],
+              "path": ["signup"]
+            },
+            "description": "Register a new store account with store information"
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.globals.set('authToken', responseJson.token);",
+                  "    pm.collectionVariables.set('authToken', responseJson.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["login"]
+            },
+            "description": "Login with email and password. Sets authToken variable on success."
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["verify"]
+            },
+            "description": "Verify the current authentication token"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User Management",
+      "item": [
+        {
+          "name": "Get Roles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/roles",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles"]
+            },
+            "description": "Fetch all available user roles"
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user",
+              "host": ["{{baseUrl}}"],
+              "path": ["user"]
+            },
+            "description": "Get current user profile information"
+          },
+          "response": []
+        },
+        {
+          "name": "Update User Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"email\": \"updated@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user",
+              "host": ["{{baseUrl}}"],
+              "path": ["user"]
+            },
+            "description": "Update user profile information"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products?limit=25&offset=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["products"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "25",
+                  "description": "Number of products to fetch"
+                },
+                {
+                  "key": "offset",
+                  "value": "0",
+                  "description": "Number of products to skip"
+                },
+                {
+                  "key": "filter",
+                  "value": "",
+                  "description": "Search filter",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "",
+                  "description": "Sort by field:direction",
+                  "disabled": true
+                },
+                {
+                  "key": "category",
+                  "value": "",
+                  "description": "Filter by category ID",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Fetch products with pagination and filtering options"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/:productId",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", ":productId"],
+              "variable": [
+                {
+                  "key": "productId",
+                  "value": "1",
+                  "description": "Product ID"
+                }
+              ]
+            },
+            "description": "Get detailed information about a specific product"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Product\",\n  \"description\": \"Product description\",\n  \"price\": 99.99,\n  \"category_id\": 1,\n  \"stock\": 100,\n  \"images\": [\n    {\n      \"url\": \"https://example.com/image1.jpg\",\n      \"is_main\": true\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["products"]
+            },
+            "description": "Create a new product (Store owners only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Product\",\n  \"description\": \"Updated description\",\n  \"price\": 129.99,\n  \"stock\": 75\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products/:productId",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", ":productId"],
+              "variable": [
+                {
+                  "key": "productId",
+                  "value": "1",
+                  "description": "Product ID"
+                }
+              ]
+            },
+            "description": "Update an existing product (Store owners only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products/:productId",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", ":productId"],
+              "variable": [
+                {
+                  "key": "productId",
+                  "value": "1",
+                  "description": "Product ID"
+                }
+              ]
+            },
+            "description": "Delete a product (Store owners only)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "Get All Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories"]
+            },
+            "description": "Fetch all product categories"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Category by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories/:categoryId",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories", ":categoryId"],
+              "variable": [
+                {
+                  "key": "categoryId",
+                  "value": "1",
+                  "description": "Category ID"
+                }
+              ]
+            },
+            "description": "Get detailed information about a specific category"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Shopping Cart",
+      "item": [
+        {
+          "name": "Get Cart",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/shopping-cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["shopping-cart"]
+            },
+            "description": "Get current user's shopping cart"
+          },
+          "response": []
+        },
+        {
+          "name": "Add to Cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": 1,\n  \"count\": 2,\n  \"detail\": \"Size: M, Color: Blue\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/shopping-cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["shopping-cart"]
+            },
+            "description": "Add item to shopping cart"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Cart Item",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"count\": 3\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/shopping-cart/:itemId",
+              "host": ["{{baseUrl}}"],
+              "path": ["shopping-cart", ":itemId"],
+              "variable": [
+                {
+                  "key": "itemId",
+                  "value": "1",
+                  "description": "Cart item ID"
+                }
+              ]
+            },
+            "description": "Update quantity of item in cart"
+          },
+          "response": []
+        },
+        {
+          "name": "Remove from Cart",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/shopping-cart/:itemId",
+              "host": ["{{baseUrl}}"],
+              "path": ["shopping-cart", ":itemId"],
+              "variable": [
+                {
+                  "key": "itemId",
+                  "value": "1",
+                  "description": "Cart item ID"
+                }
+              ]
+            },
+            "description": "Remove item from shopping cart"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"address_id\": 1,\n  \"order_date\": \"2024-01-15T10:30:00Z\",\n  \"card_no\": \"1234567890123456\",\n  \"card_name\": \"John Doe\",\n  \"card_expire_month\": 12,\n  \"card_expire_year\": 2025,\n  \"card_ccv\": 123,\n  \"price\": 299.99\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/order",
+              "host": ["{{baseUrl}}"],
+              "path": ["order"]
+            },
+            "description": "Create a new order from cart items"
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/order",
+              "host": ["{{baseUrl}}"],
+              "path": ["order"]
+            },
+            "description": "Get all orders for the current user"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Order by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/order/:orderId",
+              "host": ["{{baseUrl}}"],
+              "path": ["order", ":orderId"],
+              "variable": [
+                {
+                  "key": "orderId",
+                  "value": "1",
+                  "description": "Order ID"
+                }
+              ]
+            },
+            "description": "Get detailed information about a specific order"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Addresses",
+      "item": [
+        {
+          "name": "Get User Addresses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/address",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "address"]
+            },
+            "description": "Get all addresses for the current user"
+          },
+          "response": []
+        },
+        {
+          "name": "Add Address",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Home\",\n  \"name\": \"John Doe\",\n  \"surname\": \"Doe\",\n  \"phone\": \"05551234567\",\n  \"city\": \"Istanbul\",\n  \"district\": \"Kadikoy\",\n  \"neighborhood\": \"Moda\",\n  \"address\": \"123 Main Street, Apt 4B\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/address",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "address"]
+            },
+            "description": "Add a new address for the user"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Address",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Work\",\n  \"name\": \"John Doe\",\n  \"surname\": \"Doe\",\n  \"phone\": \"05551234567\",\n  \"city\": \"Istanbul\",\n  \"district\": \"Besiktas\",\n  \"neighborhood\": \"Etiler\",\n  \"address\": \"456 Business Ave, Floor 10\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/address/:addressId",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "address", ":addressId"],
+              "variable": [
+                {
+                  "key": "addressId",
+                  "value": "1",
+                  "description": "Address ID"
+                }
+              ]
+            },
+            "description": "Update an existing address"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Address",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/address/:addressId",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "address", ":addressId"],
+              "variable": [
+                {
+                  "key": "addressId",
+                  "value": "1",
+                  "description": "Address ID"
+                }
+              ]
+            },
+            "description": "Delete an address"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payment Methods",
+      "item": [
+        {
+          "name": "Get Payment Methods",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/card",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "card"]
+            },
+            "description": "Get all saved payment methods for the user"
+          },
+          "response": []
+        },
+        {
+          "name": "Add Payment Method",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"card_no\": \"1234567890123456\",\n  \"expire_month\": 12,\n  \"expire_year\": 2025,\n  \"name_on_card\": \"John Doe\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/card",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "card"]
+            },
+            "description": "Add a new payment method"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Payment Method",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"card_no\": \"1234567890123456\",\n  \"expire_month\": 6,\n  \"expire_year\": 2026,\n  \"name_on_card\": \"John Doe\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/card/:cardId",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "card", ":cardId"],
+              "variable": [
+                {
+                  "key": "cardId",
+                  "value": "1",
+                  "description": "Card ID"
+                }
+              ]
+            },
+            "description": "Update an existing payment method"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Payment Method",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/card/:cardId",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "card", ":cardId"],
+              "variable": [
+                {
+                  "key": "cardId",
+                  "value": "1",
+                  "description": "Card ID"
+                }
+              ]
+            },
+            "description": "Delete a payment method"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Store Management",
+      "item": [
+        {
+          "name": "Get Store Info",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/store",
+              "host": ["{{baseUrl}}"],
+              "path": ["store"]
+            },
+            "description": "Get store information (Store owners only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Store Info",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Store Name\",\n  \"phone\": \"05559876543\",\n  \"tax_no\": \"T5678V123456\",\n  \"bank_account\": \"TR987654321098765432109876\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/store",
+              "host": ["{{baseUrl}}"],
+              "path": ["store"]
+            },
+            "description": "Update store information (Store owners only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Store Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/store/orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["store", "orders"]
+            },
+            "description": "Get all orders for the store (Store owners only)"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
