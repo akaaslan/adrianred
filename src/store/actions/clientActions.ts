@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   SET_USER,
   LOGOUT_USER,
   SET_ROLES,
   SET_THEME,
-  SET_LANGUAGE
+  SET_LANGUAGE,
+  SET_LOGIN_LOADING,
+  SET_LOGIN_ERROR
 } from '../actionTypes';
 
 // Action Creators - Client
@@ -29,4 +32,14 @@ export const setTheme = (theme: string) => ({
 export const setLanguage = (language: string) => ({
   type: SET_LANGUAGE,
   payload: language
+});
+
+export const setLoginLoading = (loading: boolean) => ({
+  type: SET_LOGIN_LOADING,
+  payload: loading
+});
+
+export const setLoginError = (error: string | null) => ({
+  type: SET_LOGIN_ERROR,
+  payload: error
 });

@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Search, User, ShoppingCart, Heart } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "../store/types";
 import { logoutUser } from "../store";
+import { getGravatarUrlSync } from "../utils/gravatar";
+import { fetchCategories } from "../store/actions/thunkActions";
 
 interface HeaderProps {
   theme?: "light" | "dark";
@@ -13,7 +16,15 @@ const Header: React.FC<HeaderProps> = ({ theme = "dark" }) => {
   const location = useLocation();
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.client.user);
-  const isLoggedIn = user && Object.keys(user).length > 0;
+  const categories = useSelector((state: RootState) => state.product.categories);
+  const isLoggedIn = user && typeof user === 'object' && Object.keys(user).length > 0;
+  const isSpecialUser = user && user.email === 'mineldilaybayrak@hotmail.com';
+  
+  // Debug logging to see what's happening
+  console.log('Header Debug - User object:', user);
+  console.log('Header Debug - User type:', typeof user);
+  console.log('Header Debug - User keys:', Object.keys(user || {}));
+  console.log('Header Debug - IsLoggedIn:', isLoggedIn);
   
   const textColor = theme === "light" ? "text-gray-500 drop-shadow-lg" : "text-white";
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -23,7 +34,15 @@ const Header: React.FC<HeaderProps> = ({ theme = "dark" }) => {
   
   const isHomePage = location.pathname === '/';
 
+  // Fetch categories on component mount
+  useEffect(() => {
+    (dispatch as any)(fetchCategories());
+  }, [dispatch]);
+
   const handleLogout = () => {
+    // Clear tokens from both storage types
+    localStorage.removeItem('authToken');
+    sessionStorage.removeItem('authToken');
     dispatch(logoutUser());
     setUserMenuOpen(false);
     setMobileMenuOpen(false);
@@ -75,7 +94,7 @@ const Header: React.FC<HeaderProps> = ({ theme = "dark" }) => {
       {isHomePage && scrolled && (
         <div className={`header-bg header-bg-slide`}></div>
       )}
-      <div className="relative max-w-7xl mx-[10vw] px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between" style={{zIndex: 1}}>
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between" style={{zIndex: 1}}>
         {/* Logo */}
         <div className={`text-3xl font-bold tracking-tight ${textColor} flex-shrink-0`}><Link to="/">adrianred</Link></div>
 
@@ -89,11 +108,44 @@ const Header: React.FC<HeaderProps> = ({ theme = "dark" }) => {
                 <polyline points="6 9 12 15 18 9"/>
               </svg>
             </button>
-            <div className="absolute left-0 mt-0 w-40 bg-white rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity z-50">
-              <Link to="/shop" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">All Products</Link>
-              <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Men</a>
-              <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Women</a>
-              <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Sale</a>
+            <div className="absolute left-0 mt-0 w-80 bg-white rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity z-50">
+              <div className="p-4">
+                <Link to="/shop" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 rounded mb-2 font-semibold">
+                  All Products
+                </Link>
+                
+                {/* Categories organized by gender */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-bold text-gray-800 mb-2 px-4">Kadın</h4>
+                    {categories
+                      .filter(cat => cat.gender.toLowerCase() === 'kadın')
+                      .map(category => (
+                        <Link
+                          key={category.id}
+                          to={`/shop/${category.gender}/${category.title}/${category.id}`}
+                          className="block px-4 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-800 rounded transition-colors"
+                        >
+                          {category.title}
+                        </Link>
+                      ))}
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-gray-800 mb-2 px-4">Erkek</h4>
+                    {categories
+                      .filter(cat => cat.gender.toLowerCase() === 'erkek')
+                      .map(category => (
+                        <Link
+                          key={category.id}
+                          to={`/shop/${category.gender}/${category.title}/${category.id}`}
+                          className="block px-4 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-800 rounded transition-colors"
+                        >
+                          {category.title}
+                        </Link>
+                      ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <Link to="/team" className={`${textColor} font-bold`}>Team</Link>
@@ -137,10 +189,37 @@ const Header: React.FC<HeaderProps> = ({ theme = "dark" }) => {
                   </svg>
                 </button>
                 <div className={`overflow-hidden transition-all duration-300 ${mobileShopOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'} bg-white rounded shadow-lg mt-2 ml-2`}> 
-                  <Link to="/shop" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">All Products</Link>
-                  <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Men</a>
-                  <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Women</a>
-                  <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Sale</a>
+                  <Link to="/shop" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 font-semibold border-b">
+                    All Products
+                  </Link>
+                  
+                  {/* Kadın categories */}
+                  <div className="px-4 py-2 bg-gray-50 font-bold text-gray-800">Kadın</div>
+                  {categories
+                    .filter(cat => cat.gender.toLowerCase() === 'kadın')
+                    .map(category => (
+                      <Link
+                        key={category.id}
+                        to={`/shop/${category.gender}/${category.title}/${category.id}`}
+                        className="block px-6 py-2 text-gray-600 hover:bg-gray-100"
+                      >
+                        {category.title}
+                      </Link>
+                    ))}
+                  
+                  {/* Erkek categories */}
+                  <div className="px-4 py-2 bg-gray-50 font-bold text-gray-800">Erkek</div>
+                  {categories
+                    .filter(cat => cat.gender.toLowerCase() === 'erkek')
+                    .map(category => (
+                      <Link
+                        key={category.id}
+                        to={`/shop/${category.gender}/${category.title}/${category.id}`}
+                        className="block px-6 py-2 text-gray-600 hover:bg-gray-100"
+                      >
+                        {category.title}
+                      </Link>
+                    ))}
                 </div>
               </div>
               <Link to="/team" className={`${textColor} font-bold py-2 px-2 rounded hover:bg-gray-800 transition`}>Team</Link>
@@ -218,12 +297,20 @@ const Header: React.FC<HeaderProps> = ({ theme = "dark" }) => {
                 title="User Account"
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
               >
-                <User className="w-5 h-5" />
-                <span className="text-sm font-sm font-bold">{user.name || 'Account'}</span>
+                {(user.email || user.mail || user.emailAddress) && (
+                  <img 
+                    src={getGravatarUrlSync(user.email || user.mail || user.emailAddress, 32)} 
+                    alt="Profile"
+                    className="w-8 h-8 rounded-full border-2 border-white/20"
+                  />
+                )}
+                <span className="text-sm font-sm font-bold">
+                  {user.name || user.firstName || user.email || user.mail || user.emailAddress || user.username || 'Account'}
+                </span>
               </button>
             )}
             
-            <div className="absolute right-0 mt-0 w-48 bg-white rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity z-50">
+            <div className="absolute right-0 mt-0 w-64 bg-white rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity z-50">
               {!isLoggedIn ? (
                 <>
                   <Link to="/login" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Login</Link>
@@ -231,6 +318,25 @@ const Header: React.FC<HeaderProps> = ({ theme = "dark" }) => {
                 </>
               ) : (
                 <>
+                  <div className="px-4 py-3 border-b border-gray-200">
+                    <div className="flex items-center gap-3">
+                      {(user.email || user.mail || user.emailAddress) && (
+                        <img 
+                          src={getGravatarUrlSync(user.email || user.mail || user.emailAddress, 40)} 
+                          alt="Profile"
+                          className="w-10 h-10 rounded-full"
+                        />
+                      )}
+                      <div>
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {user.name || user.firstName || user.username || 'User'}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">
+                          {user.email || user.mail || user.emailAddress}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                   <Link to="/profile" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">My Account</Link>
                   <Link to="/orders" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Order History</Link>
                   <div className="border-t border-gray-200"></div>
@@ -244,6 +350,18 @@ const Header: React.FC<HeaderProps> = ({ theme = "dark" }) => {
               )}
             </div>
           </div>
+          
+          {/* Special Button for Special User */}
+          {isSpecialUser && (
+            <Link 
+              to="/x9k2m5p8q1w3"
+              className={`${textColor} hover:text-gray-300 px-3 py-1 rounded border border-current transition-colors hover:bg-white hover:text-gray-800`}
+              title="Special Access"
+            >
+              <span className="text-sm font-bold">BURAYA TIKLA</span>
+            </Link>
+          )}
+          
           <button className={`${textColor} hover:text-gray-300`} title="Search">
             <Search className="w-5 h-5" />
           </button>

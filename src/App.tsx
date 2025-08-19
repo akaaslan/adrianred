@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import './App.css';
 import Header from './layout/Header';
 import Footer from './layout/Footer';
@@ -14,8 +15,22 @@ import TeamPage from './pages/TeamPage';
 import AboutPage from './pages/AboutPage';
 import SignUpPage from './pages/SignUpPage';
 import LoginPage from './pages/LoginPage';
+import EasterEggPage from './pages/EasterEggPage';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useDispatch } from 'react-redux';
+import { initializeUser, fetchCategories } from './store/actions/thunkActions';
 
 function App() {  
+  const dispatch = useDispatch();
+  
+  // Initialize user on app start
+  useEffect(() => {
+    const thunkDispatch = dispatch as any;
+    thunkDispatch(initializeUser());
+    thunkDispatch(fetchCategories());
+  }, [dispatch]);
+  
   return (
     <Router>
       <LoaderWrapper />
@@ -23,7 +38,8 @@ function App() {
       <div className="page-content">
         <Switch>
           <Route exact path="/" component={HomePage} />
-          <Route path="/shop" component={ShopPage} />
+          <Route exact path="/shop" component={ShopPage} />
+          <Route path="/shop/:gender/:categoryName/:categoryId" component={ShopPage} />
           <Route path="/product/:id" component={ProductDetailPage} />
           <Route path="/contact" component={ContactPage} />
           <Route path="/team" component={TeamPage} />
@@ -31,9 +47,22 @@ function App() {
           <Route path="/signup" component={SignUpPage} />
           <Route path="/login" component={LoginPage} />
           <Route path="/product" component={ProductList} />
+          <Route path="/x9k2m5p8q1w3" component={EasterEggPage} />
         </Switch>
       </div>
       <Footer />
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </Router>
   );
 }

@@ -7,9 +7,10 @@ import {
   SET_OFFSET,
   SET_FILTER
 } from '../actionTypes';
+import type { Category } from '../types';
 
 // Action Creators - Product
-export const setCategories = (categories: unknown[]) => ({
+export const setCategories = (categories: Category[]) => ({
   type: SET_CATEGORIES,
   payload: categories
 });

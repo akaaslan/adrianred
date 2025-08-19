@@ -8,6 +8,7 @@ import EditorsPick from '../components/EditorsPick';
 import FeaturedProducts from '../components/FeaturedProducts';
 import NewSeasonProduct from '../components/NewSeasonProduct';
 import FeaturedPosts from '../components/FeaturedPosts';
+import TopCategories from '../components/TopCategories';
 
 import HeroCarousel from '../components/HeroCarousel';
 
@@ -83,6 +84,7 @@ export default function HomePage() {
           ))}
         </Slider>
       </div>
+      <TopCategories />
       <EditorsPick/>
       <FeaturedProducts />
       <HeroCarousel />

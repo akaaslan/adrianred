@@ -1,4 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+// Category Interface
+export interface Category {
+  id: number;
+  title: string;
+  gender: string;
+  rating: number;
+  img?: string;
+}
+
 // Redux State Types
 export interface ClientState {
   user: any;
@@ -7,10 +16,12 @@ export interface ClientState {
   roles: any[];
   theme: string;
   language: string;
+  loginLoading: boolean;
+  loginError: string | null;
 }
 
 export interface ProductState {
-  categories: any[];
+  categories: Category[];
   productList: any[];
   total: number;
   limit: number;

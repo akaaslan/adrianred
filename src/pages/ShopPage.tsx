@@ -1,21 +1,32 @@
+// /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect } from "react";
 import ShopItemList from "../components/ShopItemList";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+
+interface ShopPageParams {
+  gender?: string;
+  categoryName?: string;
+  categoryId?: string;
+}
 
 export default function ShopPage() {
+    const { gender, categoryName } = useParams<ShopPageParams>();
 
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
 
+    const pageTitle = categoryName ? `${categoryName} - ${gender}` : 'Shop';
+    const breadcrumbText = categoryName ? `${gender} > ${categoryName}` : 'Shop';
+
     return (
         <div className="flex flex-col w-full">
             <div className="flex flex-row py-10 px-[12vw] pt-24 items-center justify-between w-full">
-                <h1 className="text-2xl font-bold ">Shop</h1>
+                <h1 className="text-2xl font-bold capitalize">{pageTitle}</h1>
                 <div className="flex items-center ml-auto">
                     <Link to="/" className="text-lg text-black mr-1 hover:underline">Home</Link>
                     <span className="text-lg text-gray-400">&gt;</span>
-                    <span className="text-lg ml-1 hover:underline text-gray-400">Shop</span>
+                    <span className="text-lg ml-1 hover:underline text-gray-400 capitalize">{breadcrumbText}</span>
                 </div>
             </div>
                 <div className="flex flex-col md:flex-row w-full md:w-screen max-w-[85vw] ml-[6vw] md:ml-[7vw] md:h-[30vh] gap-4 py-4">

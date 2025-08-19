@@ -1,103 +1,79 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect } from 'react';
+import { Link, useHistory, useLocation } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
 import { Eye, EyeOff } from 'lucide-react';
-import axiosInstance from '../api/axiosInstance';
+import { toast } from 'react-toastify';
+import { loginUser } from '../store/actions/thunkActions';
+import { setLoginError } from '../store/actions/clientActions';
+import { useState } from 'react';
+import type { RootState } from '../store/types';
 
-interface FormData {
+interface LoginFormData {
   email: string;
   password: string;
-}
-
-interface FormErrors {
-  [key: string]: string;
+  rememberMe: boolean;
 }
 
 export default function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [submitError, setSubmitError] = useState<string>('');
-  const [successMessage, setSuccessMessage] = useState<string>('');
-  const [formData, setFormData] = useState<FormData>({
-    email: '',
-    password: '',
+  const dispatch = useDispatch();
+  const history = useHistory();
+  const location = useLocation();
+  
+  const { loginLoading, loginError } = useSelector((state: RootState) => state.client);
+  
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    defaultValues: {
+      email: '',
+      password: '',
+      rememberMe: false,
+    },
   });
-  const [errors, setErrors] = useState<FormErrors>({});
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
-
-    // Email validation
-    const emailPattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!emailPattern.test(formData.email)) {
-      newErrors.email = 'Invalid email address';
+  // Show error messages with toast
+  useEffect(() => {
+    if (loginError) {
+      toast.error(loginError);
     }
+  }, [loginError]);
 
-    // Password validation
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  const onSubmit = async (data: LoginFormData) => {
+    // Clear any previous errors
+    dispatch(setLoginError(null));
     
-    // Clear specific error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
-  };
+    // TypeScript workaround for thunk dispatch
+    const thunkDispatch = dispatch as any;
+    const result = await thunkDispatch(loginUser({
+      email: data.email,
+      password: data.password,
+      rememberMe: data.rememberMe,
+    }));
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-
-    setIsLoading(true);
-    setSubmitError('');
-    setSuccessMessage('');
-
-    try {
-      const response = await axiosInstance.post('/login', {
-        email: formData.email,
-        password: formData.password,
-      });
-
-      if (response.status === 200 && response.data.token) {
-        // Store the token
-        localStorage.setItem('authToken', response.data.token);
-        setSuccessMessage('Login successful! Redirecting...');
-        
-        // Redirect to home page or dashboard after successful login
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 1500);
-      }
-    } catch (error: unknown) {
-      console.error('Login error:', error);
-      if (error && typeof error === 'object' && 'response' in error) {
-        const axiosError = error as { response?: { data?: { message?: string } } };
-        if (axiosError.response?.data?.message) {
-          setSubmitError(axiosError.response.data.message);
-        } else {
-          setSubmitError('Invalid email or password. Please try again.');
-        }
-      } else {
-        setSubmitError('An error occurred during login. Please try again.');
-      }
-    } finally {
-      setIsLoading(false);
+    if (result?.success) {
+      toast.success('Login successful!');
+      
+      // Get the state to see if there's a "from" location
+      const locationState = location.state as { from?: { pathname: string } } | null;
+      const from = locationState?.from?.pathname || '/';
+      
+      // Redirect to previous page or home
+      setTimeout(() => {
+        history.push(from);
+      }, 1000);
+    } else {
+      // Show error if login failed
+      const errorMessage = result?.error || 'Login failed. Please check your credentials.';
+      toast.error(errorMessage);
     }
   };
 
@@ -126,19 +102,7 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {submitError && (
-            <div className="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-              {submitError}
-            </div>
-          )}
-
-          {successMessage && (
-            <div className="mt-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
-              {successMessage}
-            </div>
-          )}
-
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -146,14 +110,18 @@ export default function LoginPage() {
               </label>
               <input
                 type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
+                {...register('email', {
+                  required: 'Email is required',
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: 'Invalid email address',
+                  },
+                })}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter your email"
               />
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
               )}
             </div>
 
@@ -165,9 +133,9 @@ export default function LoginPage() {
               <div className="mt-1 relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
+                  {...register('password', {
+                    required: 'Password is required',
+                  })}
                   className="block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Enter your password"
                 />
@@ -184,7 +152,7 @@ export default function LoginPage() {
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
               )}
             </div>
 
@@ -192,12 +160,11 @@ export default function LoginPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <input
-                  id="remember-me"
-                  name="remember-me"
+                  {...register('rememberMe')}
                   type="checkbox"
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-900">
                   Remember me
                 </label>
               </div>
@@ -213,11 +180,21 @@ export default function LoginPage() {
             <div>
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={loginLoading}
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'Signing in...' : 'Sign in'}
+                {loginLoading ? 'Signing in...' : 'Sign in'}
               </button>
+            </div>
+
+            {/* Test Users Info */}
+            <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <h3 className="text-sm font-medium text-blue-900 mb-2">Test Users (Password: 123456)</h3>
+              <div className="text-xs text-blue-700 space-y-1">
+                <div>• customer@commerce.com</div>
+                <div>• store@commerce.com</div>
+                <div>• admin@commerce.com</div>
+              </div>
             </div>
 
             {/* Social Login */}

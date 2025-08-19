@@ -4,6 +4,8 @@ export const LOGOUT_USER = 'LOGOUT_USER';
 export const SET_ROLES = 'SET_ROLES';
 export const SET_THEME = 'SET_THEME';
 export const SET_LANGUAGE = 'SET_LANGUAGE';
+export const SET_LOGIN_LOADING = 'SET_LOGIN_LOADING';
+export const SET_LOGIN_ERROR = 'SET_LOGIN_ERROR';
 
 // Action Types - Product
 export const SET_CATEGORIES = 'SET_CATEGORIES';
