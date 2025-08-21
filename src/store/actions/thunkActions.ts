@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axiosInstance from '../../api/axiosInstance';
 import { setRoles, setUser, setLoginLoading, setLoginError } from './clientActions';
-import { setCategories } from './productActions';
+import { setCategories, setProductList, setTotal, setProductsLoading } from './productActions';
 
 // Thunk Action Creator to get roles
 import type { Dispatch } from 'redux';
@@ -232,6 +232,134 @@ export const fetchCategories = () => {
       ];
       
       dispatch(setCategories(fallbackCategories));
+    }
+  };
+};
+
+// Thunk Action Creator to fetch products
+interface FetchProductsParams {
+  category?: string;
+  sort?: string;
+  filter?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export const fetchProducts = (params?: FetchProductsParams) => {
+  return async (dispatch: Dispatch) => {
+    // Set loading to true
+    dispatch(setProductsLoading(true));
+
+    try {
+      // Build query string
+      const queryParams = new URLSearchParams();
+      if (params?.category) {
+        queryParams.append('category', params.category);
+      }
+      if (params?.sort) {
+        queryParams.append('sort', params.sort);
+      }
+      if (params?.filter) {
+        queryParams.append('filter', params.filter);
+      }
+      // Add pagination parameters with defaults
+      queryParams.append('limit', (params?.limit || 25).toString());
+      queryParams.append('offset', (params?.offset || 0).toString());
+
+      const queryString = queryParams.toString();
+      const endpoint = `/products?${queryString}`;
+
+      console.log('Fetching products from:', endpoint);
+      const response = await axiosInstance.get(endpoint);
+      
+      if (response.data) {
+        console.log('Products fetched successfully:', response.data);
+        
+        // Extract total and products from response
+        const { total, products } = response.data;
+        
+        // Dispatch actions to update the store
+        dispatch(setTotal(total || 0));
+        dispatch(setProductList(products || []));
+        dispatch(setProductsLoading(false));
+        
+        console.log(`Loaded ${products?.length || 0} products out of ${total || 0} total`);
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      dispatch(setProductsLoading(false));
+      
+      // Fallback products for development (simulating pagination)
+      const allFallbackProducts = [
+        {
+          id: 1,
+          name: 'Beyaz Tişört',
+          description: 'Rahat ve şık beyaz tişört',
+          price: 79.99,
+          stock: 50,
+          store_id: 1,
+          category_id: 1,
+          rating: 4.5,
+          sell_count: 120,
+          color: 'Beyaz',
+          images: [
+            { id: 1, url: 'https://picsum.photos/400/400?random=1' }
+          ]
+        },
+        {
+          id: 2,
+          name: 'Mavi Jean',
+          description: 'Klasik mavi jean pantolon',
+          price: 159.99,
+          stock: 30,
+          store_id: 1,
+          category_id: 2,
+          rating: 4.2,
+          sell_count: 85,
+          color: 'Mavi',
+          images: [
+            { id: 2, url: 'https://picsum.photos/400/400?random=2' }
+          ]
+        },
+        {
+          id: 3,
+          name: 'Kırmızı Elbise',
+          description: 'Zarif kırmızı elbise',
+          price: 299.99,
+          stock: 15,
+          store_id: 2,
+          category_id: 3,
+          rating: 4.8,
+          sell_count: 45,
+          color: 'Kırmızı',
+          images: [
+            { id: 3, url: 'https://picsum.photos/400/400?random=3' }
+          ]
+        },
+        {
+          id: 4,
+          name: 'Siyah Ayakkabı',
+          description: 'Şık siyah ayakkabı',
+          price: 399.99,
+          stock: 25,
+          store_id: 2,
+          category_id: 1,
+          rating: 4.6,
+          sell_count: 65,
+          color: 'Siyah',
+          images: [
+            { id: 4, url: 'https://picsum.photos/400/400?random=4' }
+          ]
+        }
+      ];
+      
+      // Simulate pagination in fallback
+      const offset = params?.offset || 0;
+      const limit = params?.limit || 25;
+      const paginatedFallback = allFallbackProducts.slice(offset, offset + limit);
+      
+      dispatch(setTotal(185)); // Mock total from requirement
+      dispatch(setProductList(paginatedFallback));
     }
   };
 };

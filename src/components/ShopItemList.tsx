@@ -1,131 +1,119 @@
 import React, { useState, useRef } from "react";
-import shopItems from "./ShopItemData";
+import { useSelector } from "react-redux";
+import type { RootState } from "../store";
 import ShopItemCard from "./ShopItemCard";
 
+export interface ShopItem {
+  id: number;
+  name: string;
+  department: string;
+  price: string;
+  salePrice: string;
+  colors: string[];
+  image: string;
+}
+
 const ShopItemList: React.FC = () => {
+  const { productList, total, productsLoading } = useSelector((state: RootState) => state.product);
+  
   const [view, setView] = useState<'grid' | 'list'>('grid');
-  const [sort, setSort] = useState('popularity');
-  const [page, setPage] = useState(1);
   const [filter, setFilter] = useState(false);
-  const [itemsPerPage, setItemsPerPage] = useState(12);
   const containerRef = useRef<HTMLDivElement>(null);
-  const prevPage = useRef(page);
 
-  // Sorting logic
-  const products = React.useMemo(() => {
-    const arr = [...shopItems];
-    if (sort === 'low') {
-      arr.sort((a, b) => parseFloat(a.salePrice.slice(1)) - parseFloat(b.salePrice.slice(1)));
-    } else if (sort === 'high') {
-      arr.sort((a, b) => parseFloat(b.salePrice.slice(1)) - parseFloat(a.salePrice.slice(1)));
-    }
-    return arr;
-  }, [sort]);
+  // Remove automatic fetching - this will be handled by ShopPage
+  // useEffect(() => {
+  //   dispatch(fetchProducts());
+  // }, [dispatch]);
 
-  // Pagination logic
-  const totalPages = Math.ceil(products.length / itemsPerPage);
-  const paginated = products.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+  // Transform Product data to ShopItem format
+  const transformedProducts: ShopItem[] = React.useMemo(() => {
+    return productList.map(product => ({
+      id: product.id,
+      name: product.name,
+      department: product.color || 'Fashion',
+      price: `$${(product.price * 1.2).toFixed(2)}`, // Show original price as higher
+      salePrice: `$${product.price.toFixed(2)}`,
+      colors: [product.color || '#00BFFF'],
+      image: product.images?.[0]?.url || `https://picsum.photos/400/400?random=${product.id}`
+    }));
+  }, [productList]);
 
-  React.useEffect(() => { setPage(1); }, [itemsPerPage]);
-
-  React.useEffect(() => {
-    if (prevPage.current !== page && prevPage.current !== 1) {
-      if (containerRef.current) {
-        containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }
-    prevPage.current = page;
-  }, [page]);
+  // Use transformed products directly (no pagination needed - handled by API)
+  const products = transformedProducts;
 
   return (
     <div ref={containerRef} className="bg-white w-full max-w-7xl px-4 sm:px-6 lg:px-8 mx-auto py-8 flex flex-col items-center">
-      {/* Top bar */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-10 gap-[21vw]">
-        <div className="text-gray-600 text-sm">Showing {products.length} results</div>
-        <div className="flex items-center gap-2">
-          <span className="text-gray-600 text-sm">View:</span>
-          <button
-            className={`w-8 h-8 flex items-center justify-center border rounded ${view === 'grid' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'} mr-1`}
-            title="Grid view"
-            onClick={() => setView('grid')}
-          >
-            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          </button>
-          <button
-            className={`w-8 h-8 flex items-center justify-center border rounded ${view === 'list' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'}`}
-            title="List view"
-            onClick={() => setView('list')}
-          >
-            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="7"/><rect x="3" y="14" width="18" height="7"/></svg>
-          </button>
-        </div>
-        <div className="flex items-center gap-2">
-          <select
-            className="border rounded px-2 py-1 text-sm text-gray-600"
-            aria-label="Sort products"
-            value={sort}
-            onChange={e => setSort(e.target.value)}
-          >
-            <option value="popularity">Popularity</option>
-            <option value="low">Price: Low to High</option>
-            <option value="high">Price: High to Low</option>
-          </select>
-          <select
-            className="border rounded px-2 py-1 text-sm text-gray-600"
-            aria-label="Items per page"
-            value={itemsPerPage}
-            onChange={e => setItemsPerPage(Number(e.target.value))}
-          >
-            <option value={8}>8 / page</option>
-            <option value={12}>12 / page</option>
-            <option value={16}>16 / page</option>
-            <option value={24}>24 / page</option>
-          </select>
-          <button
-            className={`px-4 py-1 rounded text-sm font-semibold ${filter ? 'bg-blue-700 text-white' : 'bg-blue-500 text-white'}`}
-            onClick={() => setFilter(f => !f)}
-            title="Filter"
-          >
-            Filter
-          </button>
-        </div>
-      </div>
-
-      {/* Product grid/list */}
-      {view === 'grid' ? (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {paginated.map((product) => (
-            <ShopItemCard key={product.id} product={product} view="grid" />
-          ))}
-        </div>
-      ) : (
-        <div className="flex flex-col gap-4">
-          {paginated.map((product) => (
-            <ShopItemCard key={product.id} product={product} view="list" />
-          ))}
+      {/* Loading Spinner */}
+      {productsLoading && (
+        <div className="flex justify-center items-center py-20">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
+          <span className="ml-4 text-gray-600 text-lg">Loading products...</span>
         </div>
       )}
 
-      {/* Pagination */}
-      <div className="flex justify-center items-center gap-2 mt-8">
-        <button
-          className="px-3 py-1 rounded border bg-gray-100 text-gray-500"
-          onClick={() => setPage(1)}
-          disabled={page === 1}
-        >First</button>
-        {Array.from({ length: totalPages }, (_, i) => (
-          <button
-            key={i}
-            className={`px-3 py-1 rounded border ${page === i + 1 ? 'bg-blue-500 text-white font-bold' : 'bg-gray-100 text-gray-500'}`}
-            onClick={() => setPage(i + 1)}
-          >{i + 1}</button>
-        ))}
-        <button
-          className="px-3 py-1 rounded border bg-gray-100 text-gray-500"
-          onClick={() => setPage(page + 1)}
-          disabled={page === totalPages}
-        >Next</button>
-      </div>
+      {/* Content - only show when not loading */}
+      {!productsLoading && (
+        <>
+          {/* Top bar */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-10 gap-[21vw]">
+            <div className="text-gray-600 text-sm">
+              Showing {products.length} results {total > 0 && `(${total} total products)`}
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-gray-600 text-sm">View:</span>
+              <button
+                className={`w-8 h-8 flex items-center justify-center border rounded ${view === 'grid' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'} mr-1`}
+                title="Grid view"
+                onClick={() => setView('grid')}
+              >
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              </button>
+              <button
+                className={`w-8 h-8 flex items-center justify-center border rounded ${view === 'list' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'}`}
+                title="List view"
+                onClick={() => setView('list')}
+              >
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="7"/><rect x="3" y="14" width="18" height="7"/></svg>
+              </button>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                className={`px-4 py-1 rounded text-sm font-semibold ${filter ? 'bg-blue-700 text-white' : 'bg-blue-500 text-white'}`}
+                onClick={() => setFilter(f => !f)}
+                title="Toggle additional filters"
+              >
+                Additional Filters
+              </button>
+            </div>
+          </div>
+
+          {/* No products message */}
+          {products.length === 0 && (
+            <div className="flex justify-center items-center py-20">
+              <p className="text-gray-500 text-lg">No products found.</p>
+            </div>
+          )}
+
+          {/* Product grid/list */}
+          {products.length > 0 && (
+            <>
+              {view === 'grid' ? (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {products.map((product) => (
+                    <ShopItemCard key={product.id} product={product} view="grid" />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  {products.map((product) => (
+                    <ShopItemCard key={product.id} product={product} view="list" />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </>
+      )}
     </div>
   );
 };

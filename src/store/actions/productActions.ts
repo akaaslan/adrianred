@@ -5,9 +5,10 @@ import {
   SET_FETCH_STATE,
   SET_LIMIT,
   SET_OFFSET,
-  SET_FILTER
+  SET_FILTER,
+  SET_PRODUCTS_LOADING
 } from '../actionTypes';
-import type { Category } from '../types';
+import type { Category, Product } from '../types';
 
 // Action Creators - Product
 export const setCategories = (categories: Category[]) => ({
@@ -15,7 +16,7 @@ export const setCategories = (categories: Category[]) => ({
   payload: categories
 });
 
-export const setProductList = (productList: unknown[]) => ({
+export const setProductList = (productList: Product[]) => ({
   type: SET_PRODUCT_LIST,
   payload: productList
 });
@@ -23,6 +24,11 @@ export const setProductList = (productList: unknown[]) => ({
 export const setTotal = (total: number) => ({
   type: SET_TOTAL,
   payload: total
+});
+
+export const setProductsLoading = (loading: boolean) => ({
+  type: SET_PRODUCTS_LOADING,
+  payload: loading
 });
 
 export const setFetchState = (fetchState: string) => ({

@@ -8,6 +8,24 @@ export interface Category {
   img?: string;
 }
 
+// Product Interface
+export interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  store_id: number;
+  category_id: number;
+  rating: number;
+  sell_count: number;
+  color: string;
+  images: Array<{
+    id: number;
+    url: string;
+  }>;
+}
+
 // Redux State Types
 export interface ClientState {
   user: any;
@@ -22,12 +40,13 @@ export interface ClientState {
 
 export interface ProductState {
   categories: Category[];
-  productList: any[];
+  productList: Product[];
   total: number;
   limit: number;
   offset: number;
   filter: string;
   fetchState: string;
+  productsLoading: boolean;
 }
 
 export interface ShoppingCartState {

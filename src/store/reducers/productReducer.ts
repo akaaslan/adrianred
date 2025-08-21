@@ -6,6 +6,7 @@ import {
   SET_LIMIT,
   SET_OFFSET,
   SET_FILTER,
+  SET_PRODUCTS_LOADING,
   FETCH_STATES
 } from '../actionTypes';
 
@@ -16,7 +17,8 @@ const initialState = {
   limit: 25,
   offset: 0,
   filter: '',
-  fetchState: FETCH_STATES.NOT_FETCHED
+  fetchState: FETCH_STATES.NOT_FETCHED,
+  productsLoading: false
 };
 
 type ProductPayload =
@@ -73,6 +75,12 @@ const productReducer = (state = initialState, action: ProductAction) => {
       return {
         ...state,
         filter: action.payload
+      };
+    
+    case SET_PRODUCTS_LOADING:
+      return {
+        ...state,
+        productsLoading: action.payload
       };
     
     default:
