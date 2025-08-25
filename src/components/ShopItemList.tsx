@@ -11,9 +11,16 @@ export interface ShopItem {
   salePrice: string;
   colors: string[];
   image: string;
+  category_id?: number;
 }
 
-const ShopItemList: React.FC = () => {
+interface ShopItemListProps {
+  gender?: string;
+  categoryName?: string;
+  categoryId?: string;
+}
+
+const ShopItemList: React.FC<ShopItemListProps> = ({ gender, categoryName, categoryId }) => {
   const { productList, total, productsLoading } = useSelector((state: RootState) => state.product);
   
   const [view, setView] = useState<'grid' | 'list'>('grid');
@@ -27,14 +34,32 @@ const ShopItemList: React.FC = () => {
 
   // Transform Product data to ShopItem format
   const transformedProducts: ShopItem[] = React.useMemo(() => {
-    return productList.map(product => ({
+    const productNames = [
+      'Siyah %100 Pamuk Bluz',
+      'Beyaz %100 Pamuk Gömlek', 
+      'Çocuk Kırmızı Türk Bayraklı Tişört',
+      'Unisex Çocuk Atatürk Tişört',
+      'Kadın Siyah Klasik Ayakkabı',
+      'Erkek Denim Pantolon',
+      'Çocuk Renkli Kazak',
+      'Kadın Beyaz Bluz',
+      'Erkek Siyah Polo Tişört',
+      'Çocuk Mavi Elbise',
+      'Kadın Kırmızı Etek',
+      'Erkek Gri Kazak'
+    ];
+    
+    const departments = ['Fashion', 'Clothing', 'Apparel', 'Style', 'Wear'];
+    
+    return productList.map((product, index) => ({
       id: product.id,
-      name: product.name,
-      department: product.color || 'Fashion',
+      name: productNames[index % productNames.length] || product.name,
+      department: departments[index % departments.length],
       price: `$${(product.price * 1.2).toFixed(2)}`, // Show original price as higher
       salePrice: `$${product.price.toFixed(2)}`,
       colors: [product.color || '#00BFFF'],
-      image: product.images?.[0]?.url || `https://picsum.photos/400/400?random=${product.id}`
+      image: product.images?.[0]?.url || `https://picsum.photos/400/400?random=${product.id + 500}`,
+      category_id: product.category_id
     }));
   }, [productList]);
 
@@ -100,13 +125,27 @@ const ShopItemList: React.FC = () => {
               {view === 'grid' ? (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {products.map((product) => (
-                    <ShopItemCard key={product.id} product={product} view="grid" />
+                    <ShopItemCard 
+                      key={product.id} 
+                      product={product} 
+                      view="grid" 
+                      gender={gender}
+                      categoryName={categoryName}
+                      categoryId={categoryId}
+                    />
                   ))}
                 </div>
               ) : (
                 <div className="flex flex-col gap-4">
                   {products.map((product) => (
-                    <ShopItemCard key={product.id} product={product} view="list" />
+                    <ShopItemCard 
+                      key={product.id} 
+                      product={product} 
+                      view="list" 
+                      gender={gender}
+                      categoryName={categoryName}
+                      categoryId={categoryId}
+                    />
                   ))}
                 </div>
               )}

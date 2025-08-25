@@ -74,8 +74,8 @@ export default function SignUpPage() {
       newErrors.email = 'Invalid email address';
     }
 
-    // Password validation
-    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    // Password validation - Updated to accept more special characters
+    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{8,}$/;
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (!passwordPattern.test(formData.password)) {
@@ -208,10 +208,10 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
       {/* Breadcrumb */}
-      <div className="max-w-md mx-auto mb-8 pt-16">
-        <nav className="flex items-center space-x-2 text-sm">
+      <div className="max-w-md mx-auto mb-6 sm:mb-8 pt-16 sm:pt-16">
+        <nav className="flex items-center space-x-2 text-xs sm:text-sm">
           <Link to="/" className="text-gray-500 hover:text-gray-700">Home</Link>
           <span className="text-gray-400">&gt;</span>
           <span className="text-gray-900">Sign Up</span>
@@ -219,9 +219,9 @@ export default function SignUpPage() {
       </div>
 
       <div className="max-w-md mx-auto">
-        <div className="bg-white py-8 px-4 shadow-lg rounded-lg sm:px-10">
+        <div className="bg-white py-6 sm:py-8 px-4 sm:px-10 shadow-lg rounded-lg">
           <div className="sm:mx-auto sm:w-full sm:max-w-md">
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            <h2 className="mt-4 sm:mt-6 text-center text-2xl sm:text-3xl font-extrabold text-gray-900">
               Create your account
             </h2>
             <p className="mt-2 text-center text-sm text-gray-600">
@@ -244,7 +244,7 @@ export default function SignUpPage() {
             </div>
           )}
 
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <form className="mt-6 sm:mt-8 space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
             {/* Name Field */}
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
@@ -255,7 +255,7 @@ export default function SignUpPage() {
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                 placeholder="Enter your full name"
               />
               {errors.name && (
@@ -273,7 +273,7 @@ export default function SignUpPage() {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                 placeholder="Enter your email"
               />
               {errors.email && (

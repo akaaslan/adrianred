@@ -7,6 +7,8 @@ import {
   SET_OFFSET,
   SET_FILTER,
   SET_PRODUCTS_LOADING,
+  SET_CURRENT_PRODUCT,
+  SET_PRODUCT_LOADING,
   FETCH_STATES
 } from '../actionTypes';
 
@@ -18,7 +20,10 @@ const initialState = {
   offset: 0,
   filter: '',
   fetchState: FETCH_STATES.NOT_FETCHED,
-  productsLoading: false
+  productsLoading: false,
+  // Product detail state
+  currentProduct: null,
+  productLoading: false
 };
 
 type ProductPayload =
@@ -81,6 +86,18 @@ const productReducer = (state = initialState, action: ProductAction) => {
       return {
         ...state,
         productsLoading: action.payload
+      };
+    
+    case SET_CURRENT_PRODUCT:
+      return {
+        ...state,
+        currentProduct: action.payload
+      };
+    
+    case SET_PRODUCT_LOADING:
+      return {
+        ...state,
+        productLoading: action.payload
       };
     
     default:

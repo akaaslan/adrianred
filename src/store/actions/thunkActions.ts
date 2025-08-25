@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axiosInstance from '../../api/axiosInstance';
 import { setRoles, setUser, setLoginLoading, setLoginError } from './clientActions';
-import { setCategories, setProductList, setTotal, setProductsLoading } from './productActions';
+import { setCategories, setProductList, setTotal, setProductsLoading, setCurrentProduct, setProductLoading } from './productActions';
 
 // Thunk Action Creator to get roles
 import type { Dispatch } from 'redux';
@@ -360,6 +360,52 @@ export const fetchProducts = (params?: FetchProductsParams) => {
       
       dispatch(setTotal(185)); // Mock total from requirement
       dispatch(setProductList(paginatedFallback));
+    }
+  };
+};
+
+// Thunk Action Creator to fetch a single product by ID
+export const fetchProduct = (productId: string | number) => {
+  return async (dispatch: Dispatch) => {
+    // Set loading to true
+    dispatch(setProductLoading(true));
+    dispatch(setCurrentProduct(null)); // Clear current product
+
+    try {
+      console.log(`Fetching product with ID: ${productId}`);
+      const response = await axiosInstance.get(`/products/${productId}`);
+      
+      if (response.data) {
+        console.log('Product fetched successfully:', response.data);
+        
+        // Dispatch action to update the store
+        dispatch(setCurrentProduct(response.data));
+        dispatch(setProductLoading(false));
+        
+        console.log(`Loaded product: ${response.data.name}`);
+      }
+    } catch (error) {
+      console.error('Error fetching product:', error);
+      dispatch(setProductLoading(false));
+      
+      // Fallback product for development
+      const fallbackProduct = {
+        id: Number(productId),
+        name: 'Sample Product',
+        description: 'This is a sample product description for development purposes.',
+        price: 199.99,
+        stock: 25,
+        store_id: 1,
+        category_id: 1,
+        rating: 4.5,
+        sell_count: 120,
+        color: 'Blue',
+        images: [
+          { id: 1, url: `https://picsum.photos/400/400?random=${productId}` }
+        ]
+      };
+      
+      dispatch(setCurrentProduct(fallbackProduct));
     }
   };
 };

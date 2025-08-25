@@ -78,9 +78,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
       {/* Breadcrumb */}
-      <div className="max-w-md mx-auto mb-8 pt-24">
+      <div className="max-w-md mx-auto mb-6 sm:mb-8 pt-20 sm:pt-24">
         <nav className="flex items-center space-x-2 text-sm">
           <Link to="/" className="text-gray-500 hover:text-gray-700">Home</Link>
           <span className="text-gray-400">&gt;</span>
@@ -89,9 +89,9 @@ export default function LoginPage() {
       </div>
 
       <div className="max-w-md mx-auto">
-        <div className="bg-white py-8 px-4 shadow-lg rounded-lg sm:px-10">
+        <div className="bg-white py-6 sm:py-8 px-4 shadow-lg rounded-lg sm:px-10">
           <div className="sm:mx-auto sm:w-full sm:max-w-md">
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            <h2 className="mt-4 sm:mt-6 text-center text-2xl sm:text-3xl font-extrabold text-gray-900">
               Sign in to your account
             </h2>
             <p className="mt-2 text-center text-sm text-gray-600">

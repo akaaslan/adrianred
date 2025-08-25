@@ -6,7 +6,9 @@ import {
   SET_LIMIT,
   SET_OFFSET,
   SET_FILTER,
-  SET_PRODUCTS_LOADING
+  SET_PRODUCTS_LOADING,
+  SET_CURRENT_PRODUCT,
+  SET_PRODUCT_LOADING
 } from '../actionTypes';
 import type { Category, Product } from '../types';
 
@@ -49,4 +51,15 @@ export const setOffset = (offset: number) => ({
 export const setFilter = (filter: string) => ({
   type: SET_FILTER,
   payload: filter
+});
+
+// Product Detail Action Creators
+export const setCurrentProduct = (product: Product | null) => ({
+  type: SET_CURRENT_PRODUCT,
+  payload: product
+});
+
+export const setProductLoading = (loading: boolean) => ({
+  type: SET_PRODUCT_LOADING,
+  payload: loading
 });

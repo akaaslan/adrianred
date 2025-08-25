@@ -47,10 +47,19 @@ export interface ProductState {
   filter: string;
   fetchState: string;
   productsLoading: boolean;
+  // Individual product detail state
+  currentProduct: Product | null;
+  productLoading: boolean;
+}
+
+export interface CartItem {
+  count: number;
+  checked: boolean;
+  product: Product;
 }
 
 export interface ShoppingCartState {
-  cart: any[];
+  cart: CartItem[];
   payment: any;
   address: any;
 }
