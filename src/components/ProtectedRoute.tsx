@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '../store';
 
 interface ProtectedRouteProps {
-  component: React.ComponentType;
+  component: React.ComponentType<Record<string, unknown>>;
   path: string;
   exact?: boolean;
 }

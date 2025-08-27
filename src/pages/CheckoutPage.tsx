@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { MapPin, Plus, Edit, Trash2, Phone, Home, User } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { clearCart } from '../store/actions/shoppingCartActions';
 import type { RootState } from '../store';
 
 interface Address {
@@ -44,6 +45,8 @@ interface CardFormData {
 }
 
 const CheckoutPage: React.FC = () => {
+  const history = useHistory();
+  const dispatch = useDispatch();
   const { cart } = useSelector((state: RootState) => state.shoppingCart);
   
   const [currentStep, setCurrentStep] = useState(1);
@@ -94,19 +97,11 @@ const CheckoutPage: React.FC = () => {
   const selectedItems = cart.filter(item => item.checked);
   const totalPrice = selectedItems.reduce((sum, item) => sum + (item.product.price * item.count), 0);
 
-  useEffect(() => {
-    const loadData = async () => {
-      await fetchAddresses();
-      await fetchCards();
-    };
-    loadData();
-  }, []);
-
   const getAuthToken = () => {
     return localStorage.getItem('token') || '';
   };
 
-  const fetchAddresses = async () => {
+  const fetchAddresses = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch('/user/address', {
@@ -117,8 +112,13 @@ const CheckoutPage: React.FC = () => {
       });
       
       if (response.ok) {
-        const data = await response.json();
-        setAddresses(data);
+        try {
+          const data = await response.json();
+          setAddresses(data);
+        } catch (jsonError) {
+          console.error('Failed to parse addresses JSON:', jsonError);
+          toast.error('Adres verisi geçersiz format');
+        }
       } else {
         console.error('Failed to fetch addresses');
       }
@@ -128,9 +128,9 @@ const CheckoutPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchCards = async () => {
+  const fetchCards = useCallback(async () => {
     try {
       const response = await fetch('/user/card', {
         headers: {
@@ -140,8 +140,13 @@ const CheckoutPage: React.FC = () => {
       });
       
       if (response.ok) {
-        const data = await response.json();
-        setCards(data);
+        try {
+          const data = await response.json();
+          setCards(data);
+        } catch (jsonError) {
+          console.error('Failed to parse cards JSON:', jsonError);
+          toast.error('Kart verisi geçersiz format');
+        }
       } else {
         console.error('Failed to fetch cards');
       }
@@ -149,7 +154,15 @@ const CheckoutPage: React.FC = () => {
       console.error('Error fetching cards:', error);
       toast.error('Kartlar yüklenirken hata oluştu');
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const loadData = async () => {
+      await fetchAddresses();
+      await fetchCards();
+    };
+    loadData();
+  }, [fetchAddresses, fetchCards]);
 
   const handleSubmitCard = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -179,12 +192,18 @@ const CheckoutPage: React.FC = () => {
         });
         fetchCards();
       } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'API request failed');
+        let errorMessage = 'API request failed';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (jsonError) {
+          console.error('Failed to parse error JSON:', jsonError);
+        }
+        throw new Error(errorMessage);
       }
     } catch (error) {
       console.error('Error saving card:', error);
-      toast.error(`Kart kaydedilirken hata oluştu: ${error.message}`);
+      toast.error(`Kart kaydedilirken hata oluştu: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`);
     } finally {
       setLoading(false);
     }
@@ -251,6 +270,84 @@ const CheckoutPage: React.FC = () => {
     return 'unknown';
   };
 
+  const handleCreateOrder = async () => {
+    if (!selectedShippingAddress || !selectedBillingAddress || !selectedCard) {
+      toast.error('Lütfen adres ve kart bilgilerini tamamlayın');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      // Find selected card
+      const selectedCardData = cards.find(card => card.id === selectedCard);
+      if (!selectedCardData) {
+        toast.error('Seçilen kart bulunamadı');
+        return;
+      }
+
+      // Prepare products array from cart
+      const products = selectedItems.map(item => ({
+        product_id: item.product.id,
+        count: item.count,
+        detail: item.product.color ? `${item.product.color} - Standart` : 'Standart'
+      }));
+
+      // Prepare order payload
+      const orderPayload = {
+        address_id: selectedShippingAddress,
+        order_date: new Date().toISOString(),
+        card_no: parseInt(selectedCardData.card_no.replace(/\s/g, '')),
+        card_name: selectedCardData.name_on_card,
+        card_expire_month: selectedCardData.expire_month,
+        card_expire_year: selectedCardData.expire_year,
+        card_ccv: 123, // In real app, this should be entered separately for security
+        price: totalPrice,
+        products: products
+      };
+
+      const response = await fetch('/order', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${getAuthToken()}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(orderPayload)
+      });
+
+      if (response.ok) {
+        // Success! Show congratulations and reset cart
+        toast.success('🎉 Tebrikler! Siparişiniz başarıyla oluşturuldu!', {
+          position: "top-center",
+          autoClose: 5000,
+        });
+        
+        // Clear the shopping cart
+        dispatch(clearCart());
+        
+        // Redirect to success page or home
+        setTimeout(() => {
+          history.push('/');
+        }, 2000);
+        
+      } else {
+        let errorMessage = 'Sipariş oluşturulamadı';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (jsonError) {
+          console.error('Failed to parse order error JSON:', jsonError);
+        }
+        throw new Error(errorMessage);
+      }
+    } catch (error) {
+      console.error('Error creating order:', error);
+      toast.error(`Sipariş oluşturulurken hata oluştu: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmitAddress = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -293,12 +390,18 @@ const CheckoutPage: React.FC = () => {
         });
         fetchAddresses();
       } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'API request failed');
+        let errorMessage = 'API request failed';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (jsonError) {
+          console.error('Failed to parse address error JSON:', jsonError);
+        }
+        throw new Error(errorMessage);
       }
     } catch (error) {
       console.error('Error saving address:', error);
-      toast.error(`Adres kaydedilirken hata oluştu: ${error.message}`);
+      toast.error(`Adres kaydedilirken hata oluştu: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`);
     } finally {
       setLoading(false);
     }
@@ -401,6 +504,8 @@ const CheckoutPage: React.FC = () => {
       </div>
     );
   };
+
+  const renderAddressCard = (address: Address, type: 'shipping' | 'billing') => {
     const isSelected = type === 'shipping' 
       ? selectedShippingAddress === address.id
       : selectedBillingAddress === address.id;
@@ -729,17 +834,11 @@ const CheckoutPage: React.FC = () => {
                     Geri Dön
                   </button>
                   <button
-                    onClick={() => {
-                      if (!selectedCard) {
-                        toast.error('Lütfen bir kart seçin');
-                        return;
-                      }
-                      toast.success('Sipariş başarıyla oluşturuldu!');
-                    }}
-                    disabled={!selectedCard}
+                    onClick={handleCreateOrder}
+                    disabled={!selectedCard || loading}
                     className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-8 py-3 rounded-lg font-semibold transition-colors"
                   >
-                    Siparişi Tamamla
+                    {loading ? 'Sipariş Oluşturuluyor...' : 'Siparişi Tamamla'}
                   </button>
                 </div>
               </div>
@@ -820,10 +919,11 @@ const CheckoutPage: React.FC = () => {
 
                 <form onSubmit={handleSubmitCard} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="card_no" className="block text-sm font-medium text-gray-700 mb-1">
                       Kart Numarası *
                     </label>
                     <input
+                      id="card_no"
                       type="text"
                       value={formatCardNumber(cardFormData.card_no)}
                       onChange={(e) => {
@@ -840,10 +940,11 @@ const CheckoutPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="name_on_card" className="block text-sm font-medium text-gray-700 mb-1">
                       Kart Üzerindeki Ad Soyad *
                     </label>
                     <input
+                      id="name_on_card"
                       type="text"
                       value={cardFormData.name_on_card}
                       onChange={(e) => setCardFormData({...cardFormData, name_on_card: e.target.value.toUpperCase()})}
@@ -856,14 +957,16 @@ const CheckoutPage: React.FC = () => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="expire_month" className="block text-sm font-medium text-gray-700 mb-1">
                         Son Kullanma Tarihi *
                       </label>
                       <div className="grid grid-cols-2 gap-2">
                         <select
+                          id="expire_month"
                           value={cardFormData.expire_month}
                           onChange={(e) => setCardFormData({...cardFormData, expire_month: parseInt(e.target.value)})}
                           className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          aria-label="Son kullanma ayı"
                           required
                         >
                           {Array.from({length: 12}, (_, i) => i + 1).map(month => (
@@ -873,9 +976,11 @@ const CheckoutPage: React.FC = () => {
                           ))}
                         </select>
                         <select
+                          id="expire_year"
                           value={cardFormData.expire_year}
                           onChange={(e) => setCardFormData({...cardFormData, expire_year: parseInt(e.target.value)})}
                           className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          aria-label="Son kullanma yılı"
                           required
                         >
                           {Array.from({length: 10}, (_, i) => new Date().getFullYear() + i).map(year => (
@@ -885,10 +990,11 @@ const CheckoutPage: React.FC = () => {
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="cvv" className="block text-sm font-medium text-gray-700 mb-1">
                         CVV *
                       </label>
                       <input
+                        id="cvv"
                         type="text"
                         maxLength={3}
                         className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
@@ -961,10 +1067,11 @@ const CheckoutPage: React.FC = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                         Ad *
                       </label>
                       <input
+                        id="name"
                         type="text"
                         value={formData.name}
                         onChange={(e) => setFormData({...formData, name: e.target.value})}
@@ -973,10 +1080,11 @@ const CheckoutPage: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="surname" className="block text-sm font-medium text-gray-700 mb-1">
                         Soyad *
                       </label>
                       <input
+                        id="surname"
                         type="text"
                         value={formData.surname}
                         onChange={(e) => setFormData({...formData, surname: e.target.value})}
@@ -987,10 +1095,11 @@ const CheckoutPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
                       Telefon *
                     </label>
                     <input
+                      id="phone"
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => setFormData({...formData, phone: e.target.value})}
@@ -1001,10 +1110,11 @@ const CheckoutPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
                       İl *
                     </label>
                     <select
+                      id="city"
                       value={formData.city}
                       onChange={(e) => setFormData({...formData, city: e.target.value})}
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -1019,10 +1129,11 @@ const CheckoutPage: React.FC = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="district" className="block text-sm font-medium text-gray-700 mb-1">
                         İlçe *
                       </label>
                       <input
+                        id="district"
                         type="text"
                         value={formData.district}
                         onChange={(e) => setFormData({...formData, district: e.target.value})}
@@ -1031,10 +1142,11 @@ const CheckoutPage: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="neighborhood" className="block text-sm font-medium text-gray-700 mb-1">
                         Mahalle *
                       </label>
                       <input
+                        id="neighborhood"
                         type="text"
                         value={formData.neighborhood}
                         onChange={(e) => setFormData({...formData, neighborhood: e.target.value})}

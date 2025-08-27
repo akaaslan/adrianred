@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -14,7 +13,6 @@ export default function ShoppingCartPage() {
 
   // Calculate totals for selected items
   const selectedItems = cart.filter(item => item.checked);
-  const totalQuantity = selectedItems.reduce((sum, item) => sum + item.count, 0);
   const totalPrice = selectedItems.reduce((sum, item) => sum + (item.product.price * item.count), 0);
 
   // Handle quantity changes
