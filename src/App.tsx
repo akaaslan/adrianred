@@ -16,7 +16,9 @@ import AboutPage from './pages/AboutPage';
 import SignUpPage from './pages/SignUpPage';
 import LoginPage from './pages/LoginPage';
 import ShoppingCartPage from './pages/ShoppingCartPage';
+import CheckoutPage from './pages/CheckoutPage';
 import EasterEggPage from './pages/EasterEggPage';
+import ProtectedRoute from './components/ProtectedRoute';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch } from 'react-redux';
@@ -44,6 +46,7 @@ function App() {
           <Route path="/shop/:gender/:categoryName/:categoryId" component={ShopPage} />
           <Route path="/product/:id" component={ProductDetailPage} />
           <Route path="/cart" component={ShoppingCartPage} />
+          <ProtectedRoute path="/checkout" component={CheckoutPage} />
           <Route path="/contact" component={ContactPage} />
           <Route path="/team" component={TeamPage} />
           <Route path="/about" component={AboutPage} />

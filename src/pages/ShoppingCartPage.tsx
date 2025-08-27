@@ -308,19 +308,21 @@ export default function ShoppingCartPage() {
 
                 {/* Create Order Button */}
                 <div className="space-y-3">
-                  <button
-                    disabled={selectedItems.length === 0}
-                    className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white py-4 px-4 rounded-lg font-semibold text-lg transition-colors duration-200 shadow-md"
-                    onClick={() => {
-                      // TODO: Implement create order functionality
-                      toast.info('Sipariş oluşturma özelliği henüz hazır değil!', {
-                        position: "top-right",
-                        autoClose: 3000,
-                      });
+                  <Link
+                    to="/checkout"
+                    className={`w-full block text-center py-4 px-4 rounded-lg font-semibold text-lg transition-colors duration-200 shadow-md ${
+                      selectedItems.length === 0
+                        ? 'bg-gray-400 cursor-not-allowed text-white'
+                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                    }`}
+                    onClick={(e) => {
+                      if (selectedItems.length === 0) {
+                        e.preventDefault();
+                      }
                     }}
                   >
                     Sepeti Onayla &gt;
-                  </button>
+                  </Link>
                   
                   <Link
                     to="/shop"
