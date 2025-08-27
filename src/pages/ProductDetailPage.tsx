@@ -18,7 +18,7 @@ interface ProductDetailParams {
 }
 
 export default function ProductDetailPage() {
-  const { gender, categoryName, categoryId, productNameSlug, productId } = useParams<ProductDetailParams>();
+  const { gender, categoryName, categoryId, productId } = useParams<ProductDetailParams>();
   const history = useHistory();
   const dispatch = useDispatch<ThunkDispatch<RootState, unknown, AnyAction>>();
   const { currentProduct, productLoading } = useSelector((state: RootState) => state.product);

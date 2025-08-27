@@ -20,7 +20,7 @@ if (isDevelopment) {
 
 // Create store with middleware
 export const store = createStore<RootState, any, object, object>(
-  rootReducer as Reducer<RootState, any>,
+  rootReducer as unknown as Reducer<RootState>,
   applyMiddleware(...middleware)
 );
 
