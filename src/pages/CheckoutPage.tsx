@@ -266,7 +266,7 @@ const CheckoutPage: React.FC = () => {
         detail: item.product.color ? `${item.product.color} - Standart` : 'Standart'
       }));
 
-      // Prepare order payload (mock için)
+      // Prepare order payload according to API specification
       const orderPayload = {
         address_id: selectedShippingAddress,
         order_date: new Date().toISOString(),
@@ -279,37 +279,59 @@ const CheckoutPage: React.FC = () => {
         products: products
       };
 
-      // Mock başarılı order oluşturma (2 saniye bekleme)
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Local storage'a sipariş kaydet (opsiyonel)
-      const savedOrders = localStorage.getItem('user_orders');
-      const existingOrders = savedOrders ? JSON.parse(savedOrders) : [];
-      const newOrder = {
-        ...orderPayload,
-        id: Date.now(),
-        status: 'confirmed'
-      };
-      existingOrders.push(newOrder);
-      localStorage.setItem('user_orders', JSON.stringify(existingOrders));
-
-      // Success! Show congratulations and reset cart
-      toast.success('🎉 Tebrikler! Siparişiniz başarıyla oluşturuldu!', {
-        position: "top-center",
-        autoClose: 5000,
+      // Send POST request to /order endpoint
+      const response = await fetch('/order', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(orderPayload)
       });
-      
-      // Clear the shopping cart
-      dispatch(clearCart());
-      
-      // Redirect to success page or home
-      setTimeout(() => {
-        history.push('/');
-      }, 2000);
+
+      if (response.ok) {
+        // Success! Clear the shopping cart
+        dispatch(clearCart());
+        
+        // Redirect to success page with animation
+        history.push('/order-success');
+        
+      } else {
+        let errorMessage = 'Sipariş oluşturulamadı';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorData.error || errorMessage;
+        } catch (jsonError) {
+          console.error('Failed to parse order error JSON:', jsonError);
+        }
+        
+        // Detaylı hata mesajı
+        const detailedError = `API Hatası (${response.status}): ${errorMessage}`;
+        throw new Error(detailedError);
+      }
         
     } catch (error) {
       console.error('Error creating order:', error);
-      toast.error(`Sipariş oluşturulurken hata oluştu: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`);
+      
+      // Detaylı hata mesajı oluştur
+      let errorMessage = 'Sipariş oluşturulurken beklenmeyen bir hata oluştu';
+      
+      if (error instanceof Error) {
+        if (error.message.includes('fetch')) {
+          errorMessage = 'Sunucuya bağlanılamadı. İnternet bağlantınızı kontrol edin.';
+        } else if (error.message.includes('API Hatası')) {
+          errorMessage = error.message;
+        } else if (error.message.includes('JSON')) {
+          errorMessage = 'Veri formatı hatası. Lütfen tekrar deneyin.';
+        } else {
+          errorMessage = `Hata: ${error.message}`;
+        }
+      }
+      
+      toast.error(errorMessage, {
+        position: window.innerWidth < 768 ? "top-center" : "top-right",
+        autoClose: 6000
+      });
     } finally {
       setLoading(false);
     }

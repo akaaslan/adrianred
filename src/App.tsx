@@ -17,6 +17,8 @@ import SignUpPage from './pages/SignUpPage';
 import LoginPage from './pages/LoginPage';
 import ShoppingCartPage from './pages/ShoppingCartPage';
 import CheckoutPage from './pages/CheckoutPage';
+import OrderSuccessPage from './pages/OrderSuccessPage';
+import PreviousOrdersPage from './pages/PreviousOrdersPage';
 import EasterEggPage from './pages/EasterEggPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { ToastContainer } from 'react-toastify';
@@ -47,6 +49,8 @@ function App() {
           <Route path="/product/:id" component={ProductDetailPage} />
           <Route path="/cart" component={ShoppingCartPage} />
           <ProtectedRoute path="/checkout" component={CheckoutPage} />
+          <Route path="/order-success" component={OrderSuccessPage} />
+          <ProtectedRoute path="/previous-orders" component={PreviousOrdersPage} />
           <Route path="/contact" component={ContactPage} />
           <Route path="/team" component={TeamPage} />
           <Route path="/about" component={AboutPage} />
@@ -58,7 +62,7 @@ function App() {
       </div>
       <Footer />
       <ToastContainer
-        position="top-right"
+        position={window.innerWidth < 768 ? "top-center" : "top-right"}
         autoClose={5000}
         hideProgressBar={false}
         newestOnTop={false}

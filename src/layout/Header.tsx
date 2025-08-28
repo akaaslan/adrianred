@@ -499,7 +499,7 @@ const Header: React.FC<HeaderProps> = ({ theme = "dark" }) => {
                     </div>
                   </div>
                   <Link to="/profile" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">My Account</Link>
-                  <Link to="/orders" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Order History</Link>
+                  <Link to="/previous-orders" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Önceki Siparişlerim</Link>
                   <div className="border-t border-gray-200"></div>
                   <button 
                     onClick={handleLogout}
