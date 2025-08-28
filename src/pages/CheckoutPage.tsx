@@ -97,34 +97,21 @@ const CheckoutPage: React.FC = () => {
   const selectedItems = cart.filter(item => item.checked);
   const totalPrice = selectedItems.reduce((sum, item) => sum + (item.product.price * item.count), 0);
 
-  const getAuthToken = () => {
-    return localStorage.getItem('token') || '';
-  };
-
   const fetchAddresses = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch('/user/address', {
-        headers: {
-          'Authorization': `Bearer ${getAuthToken()}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (response.ok) {
-        try {
-          const data = await response.json();
-          setAddresses(data);
-        } catch (jsonError) {
-          console.error('Failed to parse addresses JSON:', jsonError);
-          toast.error('Adres verisi geçersiz format');
-        }
+      // Local storage'dan adresleri al
+      const savedAddresses = localStorage.getItem('user_addresses');
+      if (savedAddresses) {
+        const data = JSON.parse(savedAddresses);
+        setAddresses(data);
       } else {
-        console.error('Failed to fetch addresses');
+        setAddresses([]);
       }
     } catch (error) {
       console.error('Error fetching addresses:', error);
       toast.error('Adresler yüklenirken hata oluştu');
+      setAddresses([]);
     } finally {
       setLoading(false);
     }
@@ -132,27 +119,18 @@ const CheckoutPage: React.FC = () => {
 
   const fetchCards = useCallback(async () => {
     try {
-      const response = await fetch('/user/card', {
-        headers: {
-          'Authorization': `Bearer ${getAuthToken()}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (response.ok) {
-        try {
-          const data = await response.json();
-          setCards(data);
-        } catch (jsonError) {
-          console.error('Failed to parse cards JSON:', jsonError);
-          toast.error('Kart verisi geçersiz format');
-        }
+      // Local storage'dan kartları al
+      const savedCards = localStorage.getItem('user_cards');
+      if (savedCards) {
+        const data = JSON.parse(savedCards);
+        setCards(data);
       } else {
-        console.error('Failed to fetch cards');
+        setCards([]);
       }
     } catch (error) {
       console.error('Error fetching cards:', error);
       toast.error('Kartlar yüklenirken hata oluştu');
+      setCards([]);
     }
   }, []);
 
@@ -169,38 +147,35 @@ const CheckoutPage: React.FC = () => {
     
     try {
       setLoading(true);
-      const method = editingCard ? 'PUT' : 'POST';
-      const payload = editingCard 
-        ? { id: editingCard.id, ...cardFormData }
-        : cardFormData;
-
-      const response = await fetch('/user/card', {
-        method,
-        headers: {
-          'Authorization': `Bearer ${getAuthToken()}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (response.ok) {
-        toast.success(editingCard ? 'Kart güncellendi' : 'Kart eklendi');
-        setShowCardForm(false);
-        setEditingCard(null);
-        setCardFormData({
-          card_no: '', expire_month: 1, expire_year: new Date().getFullYear(), name_on_card: ''
-        });
-        fetchCards();
+      
+      // Local storage'dan mevcut kartları al
+      const savedCards = localStorage.getItem('user_cards');
+      let existingCards = savedCards ? JSON.parse(savedCards) : [];
+      
+      if (editingCard) {
+        // Kart güncelle
+        existingCards = existingCards.map((card: Card) => 
+          card.id === editingCard.id ? { ...cardFormData, id: editingCard.id } : card
+        );
       } else {
-        let errorMessage = 'API request failed';
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-        } catch (jsonError) {
-          console.error('Failed to parse error JSON:', jsonError);
-        }
-        throw new Error(errorMessage);
+        // Yeni kart ekle
+        const newCard = {
+          ...cardFormData,
+          id: Date.now() // Basit ID oluşturma
+        };
+        existingCards.push(newCard);
       }
+      
+      // Local storage'a kaydet
+      localStorage.setItem('user_cards', JSON.stringify(existingCards));
+      
+      toast.success(editingCard ? 'Kart güncellendi' : 'Kart eklendi');
+      setShowCardForm(false);
+      setEditingCard(null);
+      setCardFormData({
+        card_no: '', expire_month: 1, expire_year: new Date().getFullYear(), name_on_card: ''
+      });
+      fetchCards();
     } catch (error) {
       console.error('Error saving card:', error);
       toast.error(`Kart kaydedilirken hata oluştu: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`);
@@ -216,19 +191,17 @@ const CheckoutPage: React.FC = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`/user/card/${cardId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${getAuthToken()}`,
-        }
-      });
-
-      if (response.ok) {
-        toast.success('Kart silindi');
-        fetchCards();
-      } else {
-        throw new Error('API request failed');
+      
+      // Local storage'dan kartları al ve sil
+      const savedCards = localStorage.getItem('user_cards');
+      if (savedCards) {
+        const existingCards = JSON.parse(savedCards);
+        const filteredCards = existingCards.filter((card: Card) => card.id !== cardId);
+        localStorage.setItem('user_cards', JSON.stringify(filteredCards));
       }
+      
+      toast.success('Kart silindi');
+      fetchCards();
     } catch (error) {
       console.error('Error deleting card:', error);
       toast.error('Kart silinirken hata oluştu');
@@ -293,7 +266,7 @@ const CheckoutPage: React.FC = () => {
         detail: item.product.color ? `${item.product.color} - Standart` : 'Standart'
       }));
 
-      // Prepare order payload
+      // Prepare order payload (mock için)
       const orderPayload = {
         address_id: selectedShippingAddress,
         order_date: new Date().toISOString(),
@@ -306,40 +279,34 @@ const CheckoutPage: React.FC = () => {
         products: products
       };
 
-      const response = await fetch('/order', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${getAuthToken()}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(orderPayload)
-      });
+      // Mock başarılı order oluşturma (2 saniye bekleme)
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Local storage'a sipariş kaydet (opsiyonel)
+      const savedOrders = localStorage.getItem('user_orders');
+      const existingOrders = savedOrders ? JSON.parse(savedOrders) : [];
+      const newOrder = {
+        ...orderPayload,
+        id: Date.now(),
+        status: 'confirmed'
+      };
+      existingOrders.push(newOrder);
+      localStorage.setItem('user_orders', JSON.stringify(existingOrders));
 
-      if (response.ok) {
-        // Success! Show congratulations and reset cart
-        toast.success('🎉 Tebrikler! Siparişiniz başarıyla oluşturuldu!', {
-          position: "top-center",
-          autoClose: 5000,
-        });
+      // Success! Show congratulations and reset cart
+      toast.success('🎉 Tebrikler! Siparişiniz başarıyla oluşturuldu!', {
+        position: "top-center",
+        autoClose: 5000,
+      });
+      
+      // Clear the shopping cart
+      dispatch(clearCart());
+      
+      // Redirect to success page or home
+      setTimeout(() => {
+        history.push('/');
+      }, 2000);
         
-        // Clear the shopping cart
-        dispatch(clearCart());
-        
-        // Redirect to success page or home
-        setTimeout(() => {
-          history.push('/');
-        }, 2000);
-        
-      } else {
-        let errorMessage = 'Sipariş oluşturulamadı';
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-        } catch (jsonError) {
-          console.error('Failed to parse order error JSON:', jsonError);
-        }
-        throw new Error(errorMessage);
-      }
     } catch (error) {
       console.error('Error creating order:', error);
       toast.error(`Sipariş oluşturulurken hata oluştu: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`);
@@ -353,9 +320,11 @@ const CheckoutPage: React.FC = () => {
     
     try {
       setLoading(true);
-      const method = editingAddress ? 'PUT' : 'POST';
       
-      // Transform formData to match API structure
+      // Local storage'dan mevcut adresleri al
+      const savedAddresses = localStorage.getItem('user_addresses');
+      let existingAddresses = savedAddresses ? JSON.parse(savedAddresses) : [];
+      
       const apiPayload = {
         title: formData.title,
         name: formData.name,
@@ -367,38 +336,31 @@ const CheckoutPage: React.FC = () => {
         address: formData.address
       };
       
-      const payload = editingAddress 
-        ? { id: editingAddress.id, ...apiPayload }
-        : apiPayload;
-
-      const response = await fetch('/user/address', {
-        method,
-        headers: {
-          'Authorization': `Bearer ${getAuthToken()}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (response.ok) {
-        toast.success(editingAddress ? 'Adres güncellendi' : 'Adres eklendi');
-        setShowAddressForm(false);
-        setEditingAddress(null);
-        setFormData({
-          title: '', name: '', surname: '', phone: '',
-          city: '', district: '', neighborhood: '', address: ''
-        });
-        fetchAddresses();
+      if (editingAddress) {
+        // Adres güncelle
+        existingAddresses = existingAddresses.map((address: Address) => 
+          address.id === editingAddress.id ? { ...apiPayload, id: editingAddress.id } : address
+        );
       } else {
-        let errorMessage = 'API request failed';
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-        } catch (jsonError) {
-          console.error('Failed to parse address error JSON:', jsonError);
-        }
-        throw new Error(errorMessage);
+        // Yeni adres ekle
+        const newAddress = {
+          ...apiPayload,
+          id: Date.now() // Basit ID oluşturma
+        };
+        existingAddresses.push(newAddress);
       }
+      
+      // Local storage'a kaydet
+      localStorage.setItem('user_addresses', JSON.stringify(existingAddresses));
+      
+      toast.success(editingAddress ? 'Adres güncellendi' : 'Adres eklendi');
+      setShowAddressForm(false);
+      setEditingAddress(null);
+      setFormData({
+        title: '', name: '', surname: '', phone: '',
+        city: '', district: '', neighborhood: '', address: ''
+      });
+      fetchAddresses();
     } catch (error) {
       console.error('Error saving address:', error);
       toast.error(`Adres kaydedilirken hata oluştu: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`);
@@ -414,19 +376,17 @@ const CheckoutPage: React.FC = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`/user/address/${addressId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${getAuthToken()}`,
-        }
-      });
-
-      if (response.ok) {
-        toast.success('Adres silindi');
-        fetchAddresses();
-      } else {
-        throw new Error('API request failed');
+      
+      // Local storage'dan adresleri al ve sil
+      const savedAddresses = localStorage.getItem('user_addresses');
+      if (savedAddresses) {
+        const existingAddresses = JSON.parse(savedAddresses);
+        const filteredAddresses = existingAddresses.filter((address: Address) => address.id !== addressId);
+        localStorage.setItem('user_addresses', JSON.stringify(filteredAddresses));
       }
+      
+      toast.success('Adres silindi');
+      fetchAddresses();
     } catch (error) {
       console.error('Error deleting address:', error);
       toast.error('Adres silinirken hata oluştu');
